@@ -1,0 +1,19 @@
+package org.example.finlog.enums;
+
+public enum Category {
+    BEAUTY,
+    DIGITAL_GOODS,
+    EDUCATION,
+    FAST_FOOD,
+    HOME_IMPROVEMENT,
+    MARKETPLACES,
+    MOBILE_SERVICES,
+    RESTAURANT,
+    STATIONERY,
+    SUPERMARKETS,
+    TELECOMMUNICATIONS,
+    TOP_UPS,
+    TRANSFERS,
+    TRANSPORT,
+    OTHER
+}
