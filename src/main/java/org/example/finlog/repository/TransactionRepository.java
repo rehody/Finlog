@@ -18,7 +18,7 @@ public class TransactionRepository {
 
     public List<Transaction> getFiltered(LocalDate startDate, LocalDate endDate) {
         return jdbcTemplate.queryForList(
-                "select * from transaction where ? < transaction_date < ?",
+                "select * from transaction where ? < transaction_date and transaction_date < ?",
                 Transaction.class,
                 startDate,
                 endDate
@@ -33,6 +33,6 @@ public class TransactionRepository {
                 startDate,
                 endDate
         );
-        }
+    }
 
 }

@@ -16,7 +16,7 @@ CREATE TABLE user_
     name              VARCHAR(255)                                  NOT NULL,
     password_hash     VARCHAR(255)                                  NOT NULL,
     registration_date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()     NOT NULL,
-    soft_delete       BOOLEAN                                       NOT NULL,
+    soft_delete       BOOLEAN DEFAULT FALSE                         NOT NULL,
     CONSTRAINT pk_user_ PRIMARY KEY (id)
 );
 

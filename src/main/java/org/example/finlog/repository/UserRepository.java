@@ -1,6 +1,8 @@
 package org.example.finlog.repository;
 
 import org.example.finlog.entity.User;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -17,11 +19,15 @@ public class UserRepository {
     }
 
     public User getUserByEmail(String email) {
-        return jdbcTemplate.queryForObject(
-                "select * from user_ where email = ?",
-                User.class,
-                email
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    "select * from user_ where email = ?",
+                    new BeanPropertyRowMapper<>(User.class),
+                    email
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public LocalDate getRegistrationDate(UUID id) {
@@ -29,6 +35,16 @@ public class UserRepository {
                 "select registration_date from user_ where id = ?",
                 LocalDate.class,
                 id
+        );
+    }
+
+    public void save(User user) {
+        jdbcTemplate.update(
+                "Insert into user_ (id, name, email, password_hash) values (?, ?, ?, ?)",
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPasswordHash()
         );
     }
 }
