@@ -5,6 +5,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Transactional
     public User getUserByEmail(String email) {
         try {
             return jdbcTemplate.queryForObject(
@@ -30,6 +32,7 @@ public class UserRepository {
         }
     }
 
+    @Transactional
     public LocalDate getRegistrationDate(UUID id) {
         return jdbcTemplate.queryForObject(
                 "select registration_date from user_ where id = ?",
@@ -38,6 +41,7 @@ public class UserRepository {
         );
     }
 
+    @Transactional
     public void save(User user) {
         jdbcTemplate.update(
                 "Insert into user_ (id, name, email, password_hash) values (?, ?, ?, ?)",
