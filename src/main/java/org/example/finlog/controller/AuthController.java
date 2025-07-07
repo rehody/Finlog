@@ -1,5 +1,6 @@
 package org.example.finlog.controller;
 
+import jakarta.validation.Valid;
 import org.example.finlog.DTO.AuthResponse;
 import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
@@ -22,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             String token = userService.login(request);
             return ResponseEntity.ok(new AuthResponse(token));
@@ -32,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         if (userService.getUserByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.finlog.enums.Category;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Table(name = "transaction_")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,7 +39,7 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
