@@ -22,7 +22,7 @@ public class TransactionService {
     }
 
     public List<Transaction> getFilteredData(String email, Category category, LocalDate startDate, LocalDate endDate) {
-        User user = userService.getUserByEmail(email);
+        User user = userService.getUserByEmail(email).get();
         UUID userId = user.getId();
         LocalDate registrationDate = userService.getRegistrationDate(userId);
 
