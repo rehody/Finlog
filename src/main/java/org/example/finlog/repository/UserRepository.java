@@ -43,11 +43,13 @@ public class UserRepository {
     @Transactional
     public void save(User user) {
         jdbcTemplate.update(
-                "Insert into user_ (id, name, email, password_hash) values (?, ?, ?, ?)",
+                "Insert into user_ (id, name, email, password_hash, registration_date, soft_delete) values (?, ?, ?, ?, ?, ?)",
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getPasswordHash()
+                user.getPasswordHash(),
+                user.getRegistrationDate(),
+                user.isSoftDelete()
         );
     }
 }
