@@ -2,7 +2,7 @@ package org.example.finlog.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.example.finlog.DTO.TransactionDTO;
+import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
 import org.example.finlog.service.TransactionService;
@@ -51,12 +51,12 @@ public class TransactionController {
 
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> create(
-            @Valid @RequestBody TransactionDTO dto,
+            @Valid @RequestBody TransactionRequest request,
             Principal principal
     ) {
         try {
             String username = principal.getName();
-            transactionService.save(username, dto);
+            transactionService.save(username, request);
             return ResponseEntity.ok().build();
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

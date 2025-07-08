@@ -1,10 +1,11 @@
 package org.example.finlog.service;
 
-import org.example.finlog.DTO.TransactionDTO;
+import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
 import org.example.finlog.enums.Category;
 import org.example.finlog.repository.TransactionRepository;
+import org.example.finlog.util.UuidGenerator;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,13 @@ import java.util.UUID;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserService userService;
+    private final UuidGenerator uuidGenerator;
 
 
-    public TransactionService(TransactionRepository transactionRepository, UserService userService) {
+    public TransactionService(TransactionRepository transactionRepository, UserService userService, UuidGenerator uuidGenerator) {
         this.transactionRepository = transactionRepository;
         this.userService = userService;
+        this.uuidGenerator = uuidGenerator;
     }
 
     public List<Transaction> getFilteredData(String username, Category category, LocalDate startDate, LocalDate endDate) {
@@ -41,17 +44,21 @@ public class TransactionService {
         return transactionRepository.getFiltered(category, startDate, endDate);
     }
 
-    public void save(String username, TransactionDTO dto) {
+    public void save(String username, TransactionRequest request) {
         User user = userService.getUserByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-
-        Transaction transaction = new Transaction();
-        transaction.setId(UUID.randomUUID());
-        transaction.setAmount(dto.getAmount());
-        transaction.setDescription(dto.getDescription());
-        transaction.setCategory(dto.getCategory());
-
+        Transaction transaction = mapToEntity(request, user);
         transactionRepository.save(user.getId(), transaction);
+    }
+
+    public Transaction mapToEntity(TransactionRequest request, User user) {
+        return Transaction.builder()
+                .id(uuidGenerator.generate())
+                .user(user)
+                .amount(request.getAmount())
+                .description(request.getDescription())
+                .category(request.getCategory())
+                .build();
     }
 }

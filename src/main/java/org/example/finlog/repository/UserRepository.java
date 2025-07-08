@@ -12,7 +12,6 @@ import java.util.UUID;
 
 @Repository
 public class UserRepository {
-
     private final JdbcTemplate jdbcTemplate;
 
     public UserRepository(JdbcTemplate jdbcTemplate) {
