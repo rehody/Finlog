@@ -5,6 +5,7 @@ import org.example.finlog.DTO.RegisterRequest;
 import org.example.finlog.entity.User;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
+import org.example.finlog.util.UuidGenerator;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UuidGenerator uuidGenerator;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, UuidGenerator uuidGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.uuidGenerator = uuidGenerator;
     }
 
     public Optional<User> getUserByEmail(String email) {
@@ -34,12 +37,7 @@ public class UserService {
     }
 
     public String register(RegisterRequest request) {
-
-        User user = new User();
-        user.setId(UUID.randomUUID());
-        user.setName(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        User user = mapToEntity(request);
 
         userRepository.save(user);
         return jwtService.generateToken(user.getEmail());
@@ -54,5 +52,14 @@ public class UserService {
         }
 
         return jwtService.generateToken(user.getEmail());
+    }
+
+    public User mapToEntity(RegisterRequest request) {
+        return User.builder()
+                .id(uuidGenerator.generate())
+                .name(request.getUsername())
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .build();
     }
 }
