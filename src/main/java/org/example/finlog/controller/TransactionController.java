@@ -42,7 +42,14 @@ public class TransactionController {
     ) {
         try {
             String username = principal.getName();
-            List<Transaction> transactions = transactionService.getFilteredData(username, category, startDate, endDate);
+            List<Transaction> transactions = transactionService
+                    .getFilteredData(
+                            username,
+                            category,
+                            startDate.atStartOfDay(),
+                            endDate.atStartOfDay()
+                    );
+
             return ResponseEntity.ok(transactions);
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

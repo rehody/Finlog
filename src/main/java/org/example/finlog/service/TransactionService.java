@@ -9,7 +9,7 @@ import org.example.finlog.util.UuidGenerator;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,14 +26,14 @@ public class TransactionService {
         this.uuidGenerator = uuidGenerator;
     }
 
-    public List<Transaction> getFilteredData(String username, Category category, LocalDate startDate, LocalDate endDate) {
+    public List<Transaction> getFilteredData(String username, Category category, LocalDateTime startDate, LocalDateTime endDate) {
         User user = userService.getUserByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         UUID userId = user.getId();
-        LocalDate registrationDate = userService.getRegistrationDate(userId);
+        LocalDateTime registrationDate = userService.getRegistrationDate(userId).atStartOfDay();
 
-        if (endDate == null) endDate = LocalDate.now();
+        if (endDate == null) endDate = LocalDateTime.now();
         if (startDate == null) startDate = registrationDate;
 
 
