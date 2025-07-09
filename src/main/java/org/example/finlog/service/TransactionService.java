@@ -61,4 +61,8 @@ public class TransactionService {
                 .category(request.getCategory())
                 .build();
     }
+
+    public void delete(UUID id) {
+        transactionRepository.delete(id);
+    }
 }
