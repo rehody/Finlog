@@ -59,7 +59,7 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<HttpStatus> create(
             @Valid @RequestBody TransactionRequest request,
             Principal principal
@@ -76,7 +76,7 @@ public class TransactionController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable UUID id) {
         try {
             transactionService.delete(id);
