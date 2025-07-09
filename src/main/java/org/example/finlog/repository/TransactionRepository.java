@@ -65,4 +65,11 @@ public class TransactionRepository {
                 transaction.getTransactionDate()
         );
     }
+
+    public void delete(UUID id) {
+        jdbcTemplate.update(
+                "delete from transaction_ where id = ?",
+                id
+        );
+    }
 }
