@@ -1,6 +1,5 @@
 package org.example.finlog.DTO;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +9,7 @@ import lombok.Setter;
 import org.example.finlog.enums.Category;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,12 +17,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionRequest {
-    @NotNull
+    private UUID id;
+
     private BigDecimal amount;
 
     @Size(max = 150)
     private String description;
 
-    @NotNull
     private Category category;
 }

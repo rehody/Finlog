@@ -2,6 +2,7 @@ package org.example.finlog.repository;
 
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -66,10 +67,35 @@ public class TransactionRepository {
         );
     }
 
+    @Transactional
     public void delete(UUID id) {
         jdbcTemplate.update(
                 "delete from transaction_ where id = ?",
                 id
         );
+    }
+
+    @Transactional
+    public void update(Transaction transaction) {
+        jdbcTemplate.update(
+                "update transaction_ set amount = ?, description = ?, category = ? where id = ?",
+                transaction.getAmount(),
+                transaction.getDescription(),
+                transaction.getCategory().toString(),
+                transaction.getId()
+        );
+    }
+
+    @Transactional
+    public Transaction getById(UUID id) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "select * from transaction_ where id = ?",
+                    new BeanPropertyRowMapper<>(Transaction.class),
+                    id
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }

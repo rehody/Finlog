@@ -11,8 +11,9 @@ import java.util.UUID;
 
 public class TransactionDataFactory {
 
-    public static TransactionRequest sampleTransactionRequest() {
+    public static TransactionRequest sampleTransactionRequest(UUID id) {
         return TransactionRequest.builder()
+                .id(id)
                 .amount(new BigDecimal("123.45"))
                 .description("Test description")
                 .category(Category.OTHER)

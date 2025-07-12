@@ -32,7 +32,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldSaveAndRetrieveUserByEmail() {
+    void getUserByEmail_shouldSaveAndRetrieveUserByEmail() {
         userRepository.save(user);
 
         User retrieved = userRepository.getUserByEmail(user.getEmail());
@@ -51,7 +51,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldGetRegistrationDateById() {
+    void getRegistrationDate_shouldGetRegistrationDateById() {
         userRepository.save(user);
 
         LocalDate date = userRepository.getRegistrationDate(user.getId());
