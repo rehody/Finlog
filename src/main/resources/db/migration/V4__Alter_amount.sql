@@ -1,0 +1,2 @@
+ALTER TABLE transaction_
+    ALTER COLUMN amount TYPE DECIMAL(10, 2);
