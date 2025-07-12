@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.example.finlog.enums.Category;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -25,4 +26,6 @@ public class TransactionRequest {
     private String description;
 
     private Category category;
+
+    private LocalDateTime transactionDate;
 }

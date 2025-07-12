@@ -89,6 +89,7 @@ public class TransactionService {
                 .amount(request.getAmount())
                 .description(request.getDescription())
                 .category(request.getCategory())
+                .transactionDate(request.getTransactionDate())
                 .build();
     }
 

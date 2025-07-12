@@ -138,7 +138,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void update_shouldUpdateTransaction() throws AccessDeniedException {
+    void update_shouldUpdateTransactionCorrectly() throws AccessDeniedException {
         UUID txId = UUID.randomUUID();
 
         Transaction existing = Transaction.builder()
@@ -147,18 +147,21 @@ class TransactionServiceTest {
                 .amount(BigDecimal.valueOf(100))
                 .description("old desc")
                 .category(Category.OTHER)
+                .transactionDate(LocalDateTime.of(2025, 1, 1, 0, 0))
                 .build();
 
 
         BigDecimal expectedAmount = BigDecimal.valueOf(200);
         String expectedDescription = "new desc";
         Category expectedCategory = Category.FAST_FOOD;
+        LocalDateTime expectedTransactionDate = LocalDateTime.of(2026, 1, 1, 0, 0);
 
         TransactionRequest request = TransactionRequest.builder()
                 .id(txId)
                 .amount(expectedAmount)
                 .description(expectedDescription)
                 .category(expectedCategory)
+                .transactionDate(expectedTransactionDate)
                 .build();
 
 
@@ -174,7 +177,8 @@ class TransactionServiceTest {
                         tx.getUser().equals(user) &&
                         tx.getAmount().equals(expectedAmount) &&
                         tx.getDescription().equals(expectedDescription) &&
-                        tx.getCategory().equals(expectedCategory)
+                        tx.getCategory().equals(expectedCategory) &&
+                        tx.getTransactionDate().equals(expectedTransactionDate)
         ));
 
         verify(transactionRepository, never()).delete(any());
