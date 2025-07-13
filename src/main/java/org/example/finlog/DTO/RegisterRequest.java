@@ -14,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-    @NotNull
     private String username;
 
     @NotNull

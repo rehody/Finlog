@@ -37,6 +37,10 @@ public class UserService {
     }
 
     public String register(RegisterRequest request) {
+        if (request.getUsername() == null) {
+            request.setUsername(request.getEmail());
+        }
+
         User user = mapToEntity(request);
 
         userRepository.save(user);

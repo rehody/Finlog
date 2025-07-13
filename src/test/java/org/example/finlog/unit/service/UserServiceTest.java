@@ -111,6 +111,26 @@ class UserServiceTest {
     }
 
     @Test
+    void register_shouldUseEmailAsName() {
+        RegisterRequest request = RegisterRequest.builder()
+                .email("new@example.com")
+                .password("pass")
+                .build();
+
+        when(uuidGenerator.generate()).thenReturn(userId);
+        when(passwordEncoder.encode("pass")).thenReturn("encodedPassword");
+        when(jwtService.generateToken("new@example.com")).thenReturn("token");
+
+        userService.register(request);
+
+        verify(userRepository).save(argThat(u ->
+                u.getName().equals("new@example.com")
+        ));
+
+
+    }
+
+    @Test
     void login_withValidCredentials_returnsToken() {
         LoginRequest request = LoginRequest.builder()
                 .email(user.getEmail())

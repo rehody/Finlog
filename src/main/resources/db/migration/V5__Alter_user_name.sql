@@ -1,0 +1,2 @@
+ALTER TABLE user_
+    ALTER COLUMN name DROP NOT NULL;
