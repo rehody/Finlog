@@ -42,6 +42,9 @@ public class Transaction {
     )
     private User user;
 
+    @Column(name = "user_id", insertable = false, updatable = false, nullable = false)
+    private UUID userId;
+
     @Column(nullable = false)
     private BigDecimal amount;
 

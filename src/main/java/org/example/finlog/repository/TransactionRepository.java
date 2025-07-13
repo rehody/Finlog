@@ -21,22 +21,24 @@ public class TransactionRepository {
     }
 
     @Transactional
-    public List<Transaction> getFiltered(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Transaction> getFiltered(UUID userId, LocalDateTime startDate, LocalDateTime endDate) {
         return jdbcTemplate.query(
-                "select * from transaction_ where transaction_date " +
-                        "between ? and ? order by transaction_date",
+                "select * from transaction_ where user_id = ? and " +
+                        "transaction_date between ? and ? order by transaction_date",
                 new BeanPropertyRowMapper<>(Transaction.class),
+                userId,
                 startDate,
                 endDate
         );
     }
 
     @Transactional
-    public List<Transaction> getFiltered(Category category, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Transaction> getFiltered(UUID userId, Category category, LocalDateTime startDate, LocalDateTime endDate) {
         return jdbcTemplate.query(
-                "select * from transaction_ where category = ? " +
+                "select * from transaction_ where user_id = ? and category = ? " +
                         "and transaction_date between ? and ? order by transaction_date",
                 new BeanPropertyRowMapper<>(Transaction.class),
+                userId,
                 category.toString(),
                 startDate,
                 endDate
@@ -54,10 +56,22 @@ public class TransactionRepository {
     }
 
     @Transactional
-    public void save(UUID userId, Transaction transaction) {
+    public void saveWithoutDate(UUID userId, Transaction transaction) {
         jdbcTemplate.update(
-                "insert into transaction_ (id, user_id, amount, description, " +
-                        "category, transaction_date) values (?, ?, ?, ?, ?, ?)",
+                "insert into transaction_ (id, user_id, amount, " +
+                        "description, category) values (?, ?, ?, ?, ?)",
+                transaction.getId(),
+                userId,
+                transaction.getAmount(),
+                transaction.getDescription(),
+                transaction.getCategory().toString()
+        );
+    }
+    @Transactional
+    public void saveWithDate(UUID userId, Transaction transaction) {
+        jdbcTemplate.update(
+                "insert into transaction_ (id, user_id, amount, " +
+                        "description, category, transaction_date) values (?, ?, ?, ?, ?, ?)",
                 transaction.getId(),
                 userId,
                 transaction.getAmount(),

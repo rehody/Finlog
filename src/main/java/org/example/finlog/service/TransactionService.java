@@ -41,10 +41,10 @@ public class TransactionService {
 
 
         if (category == null) {
-            return transactionRepository.getFiltered(startDate, endDate);
+            return transactionRepository.getFiltered(userId, startDate, endDate);
         }
 
-        return transactionRepository.getFiltered(category, startDate, endDate);
+        return transactionRepository.getFiltered(userId, category, startDate, endDate);
     }
 
     public void save(String username, TransactionRequest request) {
@@ -56,7 +56,7 @@ public class TransactionService {
         }
 
         Transaction transaction = mapToEntity(request, user);
-        transactionRepository.save(user.getId(), transaction);
+        transactionRepository.saveWithoutDate(user.getId(), transaction);
     }
 
     public void update(String username, TransactionRequest request) throws AccessDeniedException {
@@ -86,6 +86,7 @@ public class TransactionService {
         return Transaction.builder()
                 .id(request.getId())
                 .user(user)
+                .userId(user.getId())
                 .amount(request.getAmount())
                 .description(request.getDescription())
                 .category(request.getCategory())
@@ -94,7 +95,7 @@ public class TransactionService {
     }
 
     private void checkOwnership(User user, Transaction transaction) throws AccessDeniedException {
-        if (!transaction.getUser().getId().equals(user.getId())) {
+        if (!transaction.getUserId().equals(user.getId())) {
             throw new AccessDeniedException("Access denied");
         }
     }

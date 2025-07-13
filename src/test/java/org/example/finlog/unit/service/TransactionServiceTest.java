@@ -68,7 +68,7 @@ class TransactionServiceTest {
         List<Transaction> expected = List.of(new Transaction());
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userService.getRegistrationDate(user.getId())).thenReturn(start);
-        when(transactionRepository.getFiltered(category, start, end)).thenReturn(expected);
+        when(transactionRepository.getFiltered(user.getId(), category, start, end)).thenReturn(expected);
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), category, start, end);
 
@@ -83,7 +83,7 @@ class TransactionServiceTest {
         List<Transaction> expected = List.of(new Transaction());
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userService.getRegistrationDate(user.getId())).thenReturn(start);
-        when(transactionRepository.getFiltered(start, end)).thenReturn(expected);
+        when(transactionRepository.getFiltered(user.getId(), start, end)).thenReturn(expected);
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, start, end);
 
@@ -96,7 +96,7 @@ class TransactionServiceTest {
 
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userService.getRegistrationDate(user.getId())).thenReturn(regDate);
-        when(transactionRepository.getFiltered(any(), any())).thenReturn(List.of());
+        when(transactionRepository.getFiltered(any(), any(), any())).thenReturn(List.of());
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, null, null);
 
@@ -128,7 +128,7 @@ class TransactionServiceTest {
 
         transactionService.save(user.getEmail(), request);
 
-        verify(transactionRepository).save(eq(user.getId()), argThat(tx ->
+        verify(transactionRepository).saveWithoutDate(eq(user.getId()), argThat(tx ->
                 tx.getId().equals(txId)
                         && tx.getAmount().equals(BigDecimal.valueOf(100))
                         && tx.getDescription().equals("Lunch")
@@ -144,6 +144,7 @@ class TransactionServiceTest {
         Transaction existing = Transaction.builder()
                 .id(txId)
                 .user(user)
+                .userId(user.getId())
                 .amount(BigDecimal.valueOf(100))
                 .description("old desc")
                 .category(Category.OTHER)
@@ -182,7 +183,7 @@ class TransactionServiceTest {
         ));
 
         verify(transactionRepository, never()).delete(any());
-        verify(transactionRepository, never()).save(any(), any());
+        verify(transactionRepository, never()).saveWithoutDate(any(), any());
     }
 
     @Test
@@ -200,6 +201,7 @@ class TransactionServiceTest {
         Transaction existing = Transaction.builder()
                 .id(txId)
                 .user(user)
+                .userId(user.getId())
                 .amount(BigDecimal.valueOf(100))
                 .description("old desc")
                 .category(Category.OTHER)
@@ -266,7 +268,7 @@ class TransactionServiceTest {
         verify(transactionRepository).delete(eq(txId));
 
         verify(transactionRepository, never()).update(any());
-        verify(transactionRepository, never()).save(any(), any());
+        verify(transactionRepository, never()).saveWithoutDate(any(), any());
     }
 
     @Test
@@ -284,6 +286,7 @@ class TransactionServiceTest {
         Transaction transaction = Transaction.builder()
                 .id(txId)
                 .user(user)
+                .userId(user.getId())
                 .amount(BigDecimal.valueOf(100))
                 .description("old desc")
                 .category(Category.OTHER)

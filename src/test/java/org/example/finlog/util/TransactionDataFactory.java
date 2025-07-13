@@ -24,6 +24,7 @@ public class TransactionDataFactory {
         return Transaction.builder()
                 .id(id)
                 .user(user)
+                .userId(user.getId())
                 .amount(new BigDecimal("123.45"))
                 .description("Test description")
                 .category(Category.OTHER)
