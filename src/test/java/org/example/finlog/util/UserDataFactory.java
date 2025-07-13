@@ -2,7 +2,7 @@ package org.example.finlog.util;
 
 import org.example.finlog.entity.User;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class UserDataFactory {
@@ -13,7 +13,7 @@ public class UserDataFactory {
                 .name("username")
                 .email("sample@email.com")
                 .passwordHash("password_hash")
-                .registrationDate(LocalDate.now())
+                .registrationDate(LocalDateTime.now())
                 .softDelete(false)
                 .build();
     }

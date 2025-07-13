@@ -34,7 +34,7 @@ public class TransactionService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         UUID userId = user.getId();
-        LocalDateTime registrationDate = userService.getRegistrationDate(userId).atStartOfDay();
+        LocalDateTime registrationDate = userService.getRegistrationDate(userId);
 
         if (endDate == null) endDate = LocalDateTime.now();
         if (startDate == null) startDate = registrationDate;

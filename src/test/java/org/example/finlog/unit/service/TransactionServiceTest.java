@@ -67,7 +67,7 @@ class TransactionServiceTest {
 
         List<Transaction> expected = List.of(new Transaction());
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(userService.getRegistrationDate(user.getId())).thenReturn(start.toLocalDate());
+        when(userService.getRegistrationDate(user.getId())).thenReturn(start);
         when(transactionRepository.getFiltered(category, start, end)).thenReturn(expected);
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), category, start, end);
@@ -82,7 +82,7 @@ class TransactionServiceTest {
 
         List<Transaction> expected = List.of(new Transaction());
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(userService.getRegistrationDate(user.getId())).thenReturn(start.toLocalDate());
+        when(userService.getRegistrationDate(user.getId())).thenReturn(start);
         when(transactionRepository.getFiltered(start, end)).thenReturn(expected);
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, start, end);
@@ -95,7 +95,7 @@ class TransactionServiceTest {
         LocalDateTime regDate = LocalDateTime.of(2025, 1, 1, 0, 0);
 
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(userService.getRegistrationDate(user.getId())).thenReturn(regDate.toLocalDate());
+        when(userService.getRegistrationDate(user.getId())).thenReturn(regDate);
         when(transactionRepository.getFiltered(any(), any())).thenReturn(List.of());
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, null, null);

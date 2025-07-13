@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -79,10 +79,10 @@ class UserServiceTest {
 
     @Test
     void getRegistrationDate_returnsDateFromRepository() {
-        LocalDate date = LocalDate.of(2025, 7, 8);
+        LocalDateTime date = LocalDateTime.of(2025, 7, 8, 0, 0);
         when(userRepository.getRegistrationDate(userId)).thenReturn(date);
 
-        LocalDate result = userService.getRegistrationDate(userId);
+        LocalDateTime result = userService.getRegistrationDate(userId);
 
         assertThat(result).isEqualTo(date);
     }

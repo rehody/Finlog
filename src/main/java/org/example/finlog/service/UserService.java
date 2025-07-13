@@ -10,7 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +32,7 @@ public class UserService {
         return Optional.ofNullable(userRepository.getUserByEmail(email));
     }
 
-    public LocalDate getRegistrationDate(UUID id) {
+    public LocalDateTime getRegistrationDate(UUID id) {
         return userRepository.getRegistrationDate(id);
     }
 
@@ -60,6 +60,7 @@ public class UserService {
                 .name(request.getUsername())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .registrationDate(LocalDateTime.now())
                 .build();
     }
 }

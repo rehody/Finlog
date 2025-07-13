@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,9 +56,14 @@ class UserRepositoryTest {
     void getRegistrationDate_shouldGetRegistrationDateById() {
         userRepository.save(user);
 
-        LocalDate date = userRepository.getRegistrationDate(user.getId());
+        LocalDateTime date = userRepository.getRegistrationDate(user.getId());
 
-        assertThat(date).isEqualTo(user.getRegistrationDate());
+        assertThat(date)
+                .usingComparator(
+                        Comparator.comparing((LocalDateTime d) ->
+                                d.truncatedTo(ChronoUnit.MILLIS))
+                )
+                .isEqualTo(user.getRegistrationDate());
     }
 
     @Test

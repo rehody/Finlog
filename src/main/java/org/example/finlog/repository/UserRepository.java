@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Repository
@@ -32,10 +32,10 @@ public class UserRepository {
     }
 
     @Transactional
-    public LocalDate getRegistrationDate(UUID id) {
+    public LocalDateTime getRegistrationDate(UUID id) {
         return jdbcTemplate.queryForObject(
                 "select registration_date from user_ where id = ?",
-                LocalDate.class,
+                LocalDateTime.class,
                 id
         );
     }

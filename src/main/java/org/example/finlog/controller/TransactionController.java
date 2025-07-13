@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,9 +41,9 @@ public class TransactionController {
     public ResponseEntity<List<Transaction>> getAll(
             @RequestParam(name = "category", required = false) Category category,
             @RequestParam(name = "startDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime startDate,
             @RequestParam(name = "endDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime endDate,
             Principal principal
     ) {
         try {
@@ -52,8 +52,8 @@ public class TransactionController {
                     .getFilteredData(
                             username,
                             category,
-                            startDate.atStartOfDay(),
-                            endDate.atStartOfDay()
+                            startDate,
+                            endDate
                     );
 
             return ResponseEntity.ok(transactions);
