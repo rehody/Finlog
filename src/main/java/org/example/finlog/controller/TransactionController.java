@@ -52,7 +52,8 @@ public class TransactionController {
                         startDate,
                         endDate
                 );
-
+        log.debug("Fetching transactions for user {}, category={}, startDate={}, endDate={}",
+                username, category, startDate, endDate);
         return ResponseEntity.ok(transactions);
     }
 
@@ -63,6 +64,7 @@ public class TransactionController {
     ) {
         String username = principal.getName();
         transactionService.save(username, request);
+        log.debug("Transaction created for user: {}", username);
         return ResponseEntity.ok().build();
     }
 
@@ -73,6 +75,7 @@ public class TransactionController {
     ) throws AccessDeniedException {
         String username = principal.getName();
         transactionService.update(username, request);
+        log.debug("Transaction updated: {}", request.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -83,6 +86,7 @@ public class TransactionController {
     ) throws AccessDeniedException {
         String username = principal.getName();
         transactionService.delete(username, id);
+        log.debug("Transaction deleted: {}", id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -29,6 +29,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.debug("Type mismatch for parameter '{}': {}", ex.getName(), ex.getValue());
+
         if (ex.getRequiredType() == LocalDate.class) {
             String msg = "Invalid value or date format for the parameter " +
                     ex.getName() + ". Expected format: yyyy-MM-dd";
@@ -58,18 +60,21 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
+        log.warn("Validation failed: {}", msg);
         ErrorResponse response = new ErrorResponse(msg);
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex) {
+        log.debug("Not found: {}", ex.getMessage());
         ErrorResponse response = new ErrorResponse(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
         ErrorResponse response = new ErrorResponse(ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
