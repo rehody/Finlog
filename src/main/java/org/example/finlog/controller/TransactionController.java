@@ -7,7 +7,6 @@ import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
 import org.example.finlog.service.TransactionService;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +57,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(
+    public ResponseEntity<Void> create(
             @Valid @RequestBody TransactionRequest request,
             Principal principal
     ) {
@@ -69,7 +68,7 @@ public class TransactionController {
     }
 
     @PutMapping
-    public ResponseEntity<HttpStatus> update(
+    public ResponseEntity<Void> update(
             @Valid @RequestBody TransactionRequest request,
             Principal principal
     ) throws AccessDeniedException {
@@ -80,7 +79,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable UUID id,
             Principal principal
     ) throws AccessDeniedException {
