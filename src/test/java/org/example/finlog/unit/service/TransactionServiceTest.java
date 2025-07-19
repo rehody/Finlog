@@ -1,11 +1,11 @@
 package org.example.finlog.unit.service;
 
 
-import jakarta.persistence.EntityNotFoundException;
 import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
 import org.example.finlog.enums.Category;
+import org.example.finlog.exception.NotFoundException;
 import org.example.finlog.repository.TransactionRepository;
 import org.example.finlog.service.TransactionService;
 import org.example.finlog.service.UserService;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
@@ -109,7 +108,7 @@ class TransactionServiceTest {
 
         assertThatThrownBy(() ->
                 transactionService.getFilteredData("nope@example.com", null, null, null)
-        ).isInstanceOf(UsernameNotFoundException.class)
+        ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("User not found");
     }
 
@@ -236,7 +235,7 @@ class TransactionServiceTest {
 
         assertThatThrownBy(() ->
                 transactionService.update(user.getEmail(), request)
-        ).isInstanceOf(EntityNotFoundException.class)
+        ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Transaction not found");
 
         verify(transactionRepository, never()).update(any());
@@ -251,7 +250,7 @@ class TransactionServiceTest {
 
         assertThatThrownBy(() ->
                 transactionService.update(user.getEmail(), request)
-        ).isInstanceOf(UsernameNotFoundException.class)
+        ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("User not found: " + user.getEmail());
     }
 
@@ -314,7 +313,7 @@ class TransactionServiceTest {
 
         assertThatThrownBy(() ->
                 transactionService.delete(user.getEmail(), txId)
-        ).isInstanceOf(EntityNotFoundException.class)
+        ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Transaction not found");
     }
 
@@ -326,7 +325,7 @@ class TransactionServiceTest {
 
         assertThatThrownBy(() ->
                 transactionService.delete(user.getEmail(), txId)
-        ).isInstanceOf(UsernameNotFoundException.class)
+        ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("User not found: " + user.getEmail());
     }
 }

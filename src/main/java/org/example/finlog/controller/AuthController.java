@@ -1,18 +1,19 @@
 package org.example.finlog.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.example.finlog.DTO.AuthResponse;
 import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
 import org.example.finlog.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -23,13 +24,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            String token = userService.login(request);
-            return ResponseEntity.ok(new AuthResponse(token));
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad credentials");
-        }
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        log.debug("Login attempt: {}", request.getEmail());
+        String token = userService.login(request);
+        log.info("User logged: {}", request.getEmail());
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
     @PostMapping("/register")
@@ -39,6 +38,7 @@ public class AuthController {
         }
 
         String token = userService.register(request);
+        log.info("User registered: {}", request.getEmail());
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
