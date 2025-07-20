@@ -1,11 +1,16 @@
 package org.example.finlog.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
 import org.example.finlog.service.TransactionService;
+import org.example.finlog.util.ApiTag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +32,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("api/transactions")
+@Tag(name = ApiTag.TRANSACTIONS, description = "Financial transaction management")
 public class TransactionController {
     private final TransactionService transactionService;
 
@@ -34,6 +40,18 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    @Operation(
+            summary = "Get filtered transactions",
+            description = "Returns transactions with optional filters by category and date range",
+            parameters = {
+                    @Parameter(name = "category", description = "Transaction category", example = "FAST_FOOD"),
+                    @Parameter(name = "startDate", description = "Start date (ISO format)", example = "2025-07-20"),
+                    @Parameter(name = "endDate", description = "End date (ISO format)", example = "2026-01-01")
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered transactions"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            })
     @GetMapping
     public ResponseEntity<List<Transaction>> getAll(
             @RequestParam(name = "category", required = false) Category category,
@@ -56,6 +74,13 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
+    @Operation(
+            summary = "Create transaction",
+            description = "Creates a new financial transaction",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Transaction created successfully"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            })
     @PostMapping
     public ResponseEntity<Void> create(
             @Valid @RequestBody TransactionRequest request,
@@ -67,6 +92,14 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "Update transaction",
+            description = "Updates an existing transaction",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
+                    @ApiResponse(responseCode = "403", description = "Access denied for this user"),
+                    @ApiResponse(responseCode = "404", description = "Transaction or user not found")
+            })
     @PutMapping
     public ResponseEntity<Void> update(
             @Valid @RequestBody TransactionRequest request,
@@ -78,6 +111,15 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "Delete transaction",
+            description = "Deletes a transaction by ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
+                    @ApiResponse(responseCode = "403", description = "Access denied for this user"),
+                    @ApiResponse(responseCode = "404", description = "Transaction or user not found")
+
+            })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable UUID id,
