@@ -5,6 +5,7 @@ import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
 import org.example.finlog.enums.Category;
 import org.example.finlog.exception.NotFoundException;
+import org.example.finlog.mapper.TransactionMapper;
 import org.example.finlog.repository.TransactionRepository;
 import org.example.finlog.util.UuidGenerator;
 import org.springframework.stereotype.Service;
@@ -60,8 +61,13 @@ public class TransactionService {
             request.setId(uuidGenerator.generate());
         }
 
-        Transaction transaction = mapToEntity(request, user);
-        transactionRepository.saveWithoutDate(user.getId(), transaction);
+        Transaction transaction = TransactionMapper.mapToEntity(request, user);
+
+        if (request.getTransactionDate() == null) {
+            transactionRepository.saveWithoutDate(user.getId(), transaction);
+        } else {
+            transactionRepository.saveWithDate(user.getId(), transaction);
+        }
     }
 
     public void update(String username, TransactionRequest request) throws AccessDeniedException {
@@ -69,7 +75,7 @@ public class TransactionService {
         Transaction existing = getTransaction(request.getId());
 
         checkOwnership(user, existing);
-        Transaction transaction = mapToEntity(request, user);
+        Transaction transaction = TransactionMapper.mapToEntity(request, user);
         transactionRepository.update(transaction);
     }
 
@@ -79,18 +85,6 @@ public class TransactionService {
 
         checkOwnership(user, existing);
         transactionRepository.delete(id);
-    }
-
-    private Transaction mapToEntity(TransactionRequest request, User user) {
-        return Transaction.builder()
-                .id(request.getId())
-                .user(user)
-                .userId(user.getId())
-                .amount(request.getAmount())
-                .description(request.getDescription())
-                .category(request.getCategory())
-                .transactionDate(request.getTransactionDate())
-                .build();
     }
 
     private void checkOwnership(User user, Transaction transaction) throws AccessDeniedException {

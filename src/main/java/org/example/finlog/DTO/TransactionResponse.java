@@ -1,6 +1,7 @@
 package org.example.finlog.DTO;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.finlog.enums.Category;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 public class TransactionResponse {
     private UUID id;
