@@ -31,12 +31,10 @@ public class TransactionService {
 
     public List<Transaction> getFilteredData(String username, Category category, LocalDateTime startDate, LocalDateTime endDate) {
         User user = getUser(username);
-
         UUID userId = user.getId();
-        LocalDateTime registrationDate = userService.getRegistrationDate(userId);
 
         if (endDate == null) endDate = LocalDateTime.now();
-        if (startDate == null) startDate = registrationDate;
+        if (startDate == null) startDate = LocalDateTime.MIN;
 
 
         if (category == null) {
