@@ -153,10 +153,14 @@ class TransactionServiceTest {
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(uuidGenerator.generate()).thenReturn(txId);
 
+        BigDecimal expectedAmount = BigDecimal.valueOf(100);
+        String expectedDescription = "Lunch";
+        Category expectedCategory = Category.FAST_FOOD;
+
         TransactionRequest request = TransactionRequest.builder()
-                .amount(BigDecimal.valueOf(100))
-                .description("Lunch")
-                .category(Category.FAST_FOOD)
+                .amount(expectedAmount)
+                .description(expectedDescription)
+                .category(expectedCategory)
                 .build();
 
 
@@ -164,11 +168,42 @@ class TransactionServiceTest {
 
         verify(transactionRepository).saveWithoutDate(eq(user.getId()), argThat(tx ->
                 tx.getId().equals(txId)
-                        && tx.getAmount().equals(BigDecimal.valueOf(100))
-                        && tx.getDescription().equals("Lunch")
-                        && tx.getCategory() == Category.FAST_FOOD
+                        && tx.getAmount().equals(expectedAmount)
+                        && tx.getDescription().equals(expectedDescription)
+                        && tx.getCategory().equals(expectedCategory)
                         && tx.getUser().equals(user)
         ));
+    }
+
+    @Test
+    void save_shouldCreateTransactionWithCustomDate() {
+        UUID txId = UUID.randomUUID();
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(uuidGenerator.generate()).thenReturn(txId);
+
+        BigDecimal expectedAmount = BigDecimal.valueOf(100);
+        String exceptedDescription = "Lunch";
+        Category expectedCategory = Category.FAST_FOOD;
+        LocalDateTime expectedDate = LocalDateTime.of(2025, 7, 21, 20, 35, 15);
+
+        TransactionRequest request = TransactionRequest.builder()
+                .amount(expectedAmount)
+                .description(exceptedDescription)
+                .category(expectedCategory)
+                .transactionDate(expectedDate)
+                .build();
+
+        transactionService.save(user.getEmail(), request);
+
+        verify(transactionRepository).saveWithDate(eq(user.getId()), argThat(tx ->
+                tx.getId().equals(txId)
+                        && tx.getAmount().equals(expectedAmount)
+                        && tx.getDescription().equals(exceptedDescription)
+                        && tx.getCategory().equals(expectedCategory)
+                        && tx.getTransactionDate().equals(expectedDate)
+                        && tx.getUser().equals(user)
+        ));
+
     }
 
     @Test
