@@ -55,7 +55,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "404", description = "User not found")
             })
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAll(
+    public ResponseEntity<List<Transaction>> getFiltered(
             @RequestParam(name = "category", required = false) Category category,
             @RequestParam(name = "startDate", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime startDate,
@@ -74,6 +74,16 @@ public class TransactionController {
         log.debug("Fetching transactions for user {}, category={}, startDate={}, endDate={}",
                 username, category, startDate, endDate);
         return ResponseEntity.ok(transactions);
+    }
+  
+      @GetMapping("/{id}")
+    public ResponseEntity<Transaction> getSingle(
+            @PathVariable UUID id,
+            Principal principal
+    ) throws AccessDeniedException {
+        String username = principal.getName();
+        Transaction transaction = transactionService.getSingle(username, id);
+        return ResponseEntity.ok(transaction);
     }
 
     @Operation(

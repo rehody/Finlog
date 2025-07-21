@@ -113,6 +113,41 @@ class TransactionServiceTest {
     }
 
     @Test
+    void getSingle_shouldReturnTransactionCorrectly() throws AccessDeniedException {
+        UUID txId = UUID.randomUUID();
+        Transaction expected = TransactionDataFactory.sampleTransaction(txId, user);
+
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user));
+        when(transactionRepository.getById(txId)).thenReturn(expected);
+
+        Transaction result = transactionService.getSingle(user.getEmail(), txId);
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void getSingle_shouldThrowsWhenUserNotOwner() {
+        UUID txId = UUID.randomUUID();
+        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+
+        User attacker = User.builder()
+                .id(UUID.randomUUID())
+                .email("attacker@example.com")
+                .name("attacker")
+                .passwordHash("pass")
+                .build();
+
+
+        when(userService.getUserByEmail(attacker.getEmail())).thenReturn(Optional.of(attacker));
+        when(transactionRepository.getById(txId)).thenReturn(transaction);
+
+        assertThatThrownBy(() ->
+                transactionService.getSingle(attacker.getEmail(), txId)
+        ).isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Access denied");
+    }
+
+    @Test
     void save_shouldCreateAndSaveTransactionCorrectly() {
         UUID txId = UUID.randomUUID();
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
