@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finlog.DTO.TransactionRequest;
+import org.example.finlog.DTO.TransactionResponse;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
+import org.example.finlog.mapper.TransactionMapper;
 import org.example.finlog.service.TransactionService;
 import org.example.finlog.util.ApiTag;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -55,7 +57,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "404", description = "User not found")
             })
     @GetMapping
-    public ResponseEntity<List<Transaction>> getFiltered(
+    public ResponseEntity<List<TransactionResponse>> getFiltered(
             @RequestParam(name = "category", required = false) Category category,
             @RequestParam(name = "startDate", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime startDate,
@@ -71,9 +73,16 @@ public class TransactionController {
                         startDate,
                         endDate
                 );
+
         log.debug("Fetching transactions for user {}, category={}, startDate={}, endDate={}",
                 username, category, startDate, endDate);
-        return ResponseEntity.ok(transactions);
+
+        List<TransactionResponse> responseList = transactions
+                .stream()
+                .map(TransactionMapper::mapToDto)
+                .toList();
+
+        return ResponseEntity.ok(responseList);
     }
 
     @Operation(
@@ -86,13 +95,14 @@ public class TransactionController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getSingle(
+    public ResponseEntity<TransactionResponse> getSingle(
             @PathVariable UUID id,
             Principal principal
     ) throws AccessDeniedException {
         String username = principal.getName();
         Transaction transaction = transactionService.getSingle(username, id);
-        return ResponseEntity.ok(transaction);
+        TransactionResponse response = TransactionMapper.mapToDto(transaction);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -139,7 +149,6 @@ public class TransactionController {
                     @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
                     @ApiResponse(responseCode = "403", description = "Access denied for this user"),
                     @ApiResponse(responseCode = "404", description = "Transaction or user not found")
-
             })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
