@@ -75,8 +75,17 @@ public class TransactionController {
                 username, category, startDate, endDate);
         return ResponseEntity.ok(transactions);
     }
-  
-      @GetMapping("/{id}")
+
+    @Operation(
+            summary = "Get single transaction",
+            description = "Returns a transaction by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved a single transaction"),
+                    @ApiResponse(responseCode = "403", description = "Access denied for this user"),
+                    @ApiResponse(responseCode = "404", description = "Transaction or user not found")
+            }
+    )
+    @GetMapping("/{id}")
     public ResponseEntity<Transaction> getSingle(
             @PathVariable UUID id,
             Principal principal
