@@ -59,7 +59,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserByEmail_returnsUserIfExists() {
+    void getUserByEmail_shouldReturnUserIfExists() {
         when(userRepository.getUserByEmail("test@example.com")).thenReturn(user);
 
         Optional<User> result = userService.getUserByEmail("test@example.com");
@@ -69,7 +69,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserByEmail_returnsEmptyIfNotExists() {
+    void getUserByEmail_shouldReturnEmptyIfUserNotExists() {
         when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
 
         Optional<User> result = userService.getUserByEmail("unknown@example.com");
@@ -78,7 +78,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getRegistrationDate_returnsDateFromRepository() {
+    void getRegistrationDate_shouldReturnRegistrationDateCorrectly() {
         LocalDateTime date = LocalDateTime.of(2025, 7, 8, 0, 0);
         when(userRepository.getRegistrationDate(userId)).thenReturn(date);
 
@@ -88,7 +88,7 @@ class UserServiceTest {
     }
 
     @Test
-    void register_savesUserAndReturnsToken() {
+    void register_shouldSaveUserAndReturnToken() {
         RegisterRequest request = RegisterRequest.builder()
                 .username("NewUser")
                 .email("new@example.com")
@@ -131,7 +131,7 @@ class UserServiceTest {
     }
 
     @Test
-    void login_withValidCredentials_returnsToken() {
+    void login_shouldReturnTokenWhenValidCredentials() {
         LoginRequest request = LoginRequest.builder()
                 .email(user.getEmail())
                 .password("plainPassword")
@@ -148,7 +148,7 @@ class UserServiceTest {
     }
 
     @Test
-    void login_withInvalidEmail_throws() {
+    void login_shouldThrowWhenInvalidEmail() {
         LoginRequest request = new LoginRequest();
         request.setEmail("unknown@example.com");
         request.setPassword("pass");
@@ -161,7 +161,7 @@ class UserServiceTest {
     }
 
     @Test
-    void login_withInvalidPassword_throws() {
+    void login_shouldThrowWhenInvalidPassword() {
         LoginRequest request = new LoginRequest();
         request.setEmail(user.getEmail());
         request.setPassword("wrongPassword");
