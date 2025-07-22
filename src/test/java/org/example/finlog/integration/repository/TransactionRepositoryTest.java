@@ -52,7 +52,7 @@ class TransactionRepositoryTest {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
 
-        transactionRepository.saveWithDate(user.getId(), transaction);
+        transactionRepository.save(transaction);
 
         List<Transaction> result = transactionRepository.getAllByUserId(user.getId());
         assertThat(result).hasSize(1);
@@ -71,7 +71,7 @@ class TransactionRepositoryTest {
         UUID txId = UUID.randomUUID();
         Transaction expected = TransactionDataFactory.sampleTransaction(txId, user);
 
-        transactionRepository.saveWithDate(user.getId(), expected);
+        transactionRepository.save(expected);
 
         Transaction actual = transactionRepository.getById(txId);
 
@@ -86,8 +86,8 @@ class TransactionRepositoryTest {
         Transaction transaction2 = TransactionDataFactory.sampleTransaction(UUID.randomUUID(), user);
         transaction2.setTransactionDate(LocalDateTime.of(2025, 12, 10, 11, 11));
 
-        transactionRepository.saveWithDate(user.getId(), transaction1);
-        transactionRepository.saveWithDate(user.getId(), transaction2);
+        transactionRepository.save(transaction1);
+        transactionRepository.save(transaction2);
 
         System.out.println(transactionRepository.getById(transaction2.getId()));
 
@@ -119,10 +119,10 @@ class TransactionRepositoryTest {
         transaction4.setTransactionDate(LocalDateTime.of(2025, 11, 12, 13, 14));
         transaction4.setCategory(Category.FAST_FOOD);
 
-        transactionRepository.saveWithDate(user.getId(), transaction1);
-        transactionRepository.saveWithDate(user.getId(), transaction2);
-        transactionRepository.saveWithDate(user.getId(), transaction3);
-        transactionRepository.saveWithDate(user.getId(), transaction4);
+        transactionRepository.save(transaction1);
+        transactionRepository.save(transaction2);
+        transactionRepository.save(transaction3);
+        transactionRepository.save(transaction4);
 
         List<Transaction> filtered = transactionRepository.getFiltered(
                 user.getId(),
@@ -143,7 +143,7 @@ class TransactionRepositoryTest {
         transaction.setTransactionDate(LocalDateTime.of(2025, 7, 1, 12, 0));
         transaction.setCategory(Category.OTHER);
 
-        transactionRepository.saveWithDate(user.getId(), transaction);
+        transactionRepository.save(transaction);
 
         List<Transaction> filtered = transactionRepository.getFiltered(
                 user.getId(),
@@ -170,7 +170,7 @@ class TransactionRepositoryTest {
                 .transactionDate(transactionDate)
                 .build();
 
-        transactionRepository.saveWithDate(user.getId(), existing);
+        transactionRepository.save(existing);
 
 
         Transaction request = Transaction.builder()
@@ -209,7 +209,7 @@ class TransactionRepositoryTest {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
 
-        transactionRepository.saveWithDate(user.getId(), transaction);
+        transactionRepository.save(transaction);
 
         transactionRepository.delete(txId, 0L);
 
@@ -235,8 +235,8 @@ class TransactionRepositoryTest {
         Transaction tx1 = TransactionDataFactory.sampleTransaction(UUID.randomUUID(), user);
         Transaction tx2 = TransactionDataFactory.sampleTransaction(UUID.randomUUID(), user);
 
-        transactionRepository.saveWithDate(user.getId(), tx1);
-        transactionRepository.saveWithDate(user.getId(), tx2);
+        transactionRepository.save(tx1);
+        transactionRepository.save(tx2);
 
         int countBefore = transactionRepository.getAllByUserId(user.getId()).size();
 

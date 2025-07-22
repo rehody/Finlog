@@ -61,11 +61,7 @@ public class TransactionService {
 
         Transaction transaction = TransactionMapper.mapToEntity(request, user);
 
-        if (request.getTransactionDate() == null) {
-            transactionRepository.saveWithoutDate(user.getId(), transaction);
-        } else {
-            transactionRepository.saveWithDate(user.getId(), transaction);
-        }
+        transactionRepository.save(transaction);
     }
 
     public void update(String username, TransactionRequest request) throws AccessDeniedException {

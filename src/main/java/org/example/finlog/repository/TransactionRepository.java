@@ -2,6 +2,8 @@ package org.example.finlog.repository;
 
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
+import org.example.finlog.util.QueryResponse;
+import org.example.finlog.util.TransactionQueryFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -74,29 +76,12 @@ public class TransactionRepository {
     }
 
     @Transactional
-    public void saveWithoutDate(UUID userId, Transaction transaction) {
-        jdbcTemplate.update(
-                "insert into transaction_ (id, user_id, amount, " +
-                        "description, category) values (?, ?, ?, ?, ?)",
-                transaction.getId(),
-                userId,
-                transaction.getAmount(),
-                transaction.getDescription(),
-                transaction.getCategory().toString()
-        );
-    }
+    public void save(Transaction transaction) {
+        QueryResponse query = TransactionQueryFactory.createSaveQuery(transaction);
 
-    @Transactional
-    public void saveWithDate(UUID userId, Transaction transaction) {
         jdbcTemplate.update(
-                "insert into transaction_ (id, user_id, amount, " +
-                        "description, category, transaction_date) values (?, ?, ?, ?, ?, ?)",
-                transaction.getId(),
-                userId,
-                transaction.getAmount(),
-                transaction.getDescription(),
-                transaction.getCategory().toString(),
-                transaction.getTransactionDate()
+                query.sql(),
+                query.params()
         );
     }
 

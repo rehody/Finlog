@@ -148,6 +148,7 @@ class TransactionServiceTest {
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(uuidGenerator.generate()).thenReturn(txId);
 
+        UUID expectedUserId = user.getId();
         BigDecimal expectedAmount = BigDecimal.valueOf(100);
         String expectedDescription = "Lunch";
         Category expectedCategory = Category.FAST_FOOD;
@@ -161,8 +162,9 @@ class TransactionServiceTest {
 
         transactionService.save(user.getEmail(), request);
 
-        verify(transactionRepository).saveWithoutDate(eq(user.getId()), argThat(tx ->
+        verify(transactionRepository).save(argThat(tx ->
                 tx.getId().equals(txId)
+                        && tx.getUserId().equals(expectedUserId)
                         && tx.getAmount().equals(expectedAmount)
                         && tx.getDescription().equals(expectedDescription)
                         && tx.getCategory().equals(expectedCategory)
@@ -176,6 +178,7 @@ class TransactionServiceTest {
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(uuidGenerator.generate()).thenReturn(txId);
 
+        UUID expectedUserId = user.getId();
         BigDecimal expectedAmount = BigDecimal.valueOf(100);
         String exceptedDescription = "Lunch";
         Category expectedCategory = Category.FAST_FOOD;
@@ -190,8 +193,9 @@ class TransactionServiceTest {
 
         transactionService.save(user.getEmail(), request);
 
-        verify(transactionRepository).saveWithDate(eq(user.getId()), argThat(tx ->
+        verify(transactionRepository).save(argThat(tx ->
                 tx.getId().equals(txId)
+                        && tx.getUserId().equals(expectedUserId)
                         && tx.getAmount().equals(expectedAmount)
                         && tx.getDescription().equals(exceptedDescription)
                         && tx.getCategory().equals(expectedCategory)
@@ -247,7 +251,7 @@ class TransactionServiceTest {
         ));
 
         verify(transactionRepository, never()).delete(any(), any());
-        verify(transactionRepository, never()).saveWithoutDate(any(), any());
+        verify(transactionRepository, never()).save(any());
     }
 
     @Test
@@ -332,7 +336,7 @@ class TransactionServiceTest {
         verify(transactionRepository).delete(eq(txId), eq(0L));
 
         verify(transactionRepository, never()).update(any());
-        verify(transactionRepository, never()).saveWithoutDate(any(), any());
+        verify(transactionRepository, never()).save(any());
     }
 
     @Test
