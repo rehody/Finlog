@@ -1,5 +1,6 @@
 package org.example.finlog.integration.repository;
 
+import org.example.finlog.config.TestPostgresContainerConfig;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
 import org.example.finlog.enums.Category;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -23,6 +26,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ImportTestcontainers(TestPostgresContainerConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJdbcTest
 @ActiveProfiles("test")
 @Import({TransactionRepository.class, UserRepository.class})
@@ -176,6 +181,7 @@ class TransactionRepositoryTest {
                 .description("new desc")
                 .category(Category.FAST_FOOD)
                 .transactionDate(transactionDate)
+                .version(0L)
                 .build();
 
         transactionRepository.update(request);
@@ -205,7 +211,7 @@ class TransactionRepositoryTest {
 
         transactionRepository.saveWithDate(user.getId(), transaction);
 
-        transactionRepository.delete(txId);
+        transactionRepository.delete(txId, 0L);
 
         assertThat(transactionRepository.getById(txId)).isEqualTo(null);
     }
@@ -217,7 +223,7 @@ class TransactionRepositoryTest {
 
         int countBefore = transactionRepository.getAllByUserId(user.getId()).size();
 
-        transactionRepository.delete(txId);
+        transactionRepository.delete(txId, 0L);
 
         int countAfter = transactionRepository.getAllByUserId(user.getId()).size();
 
@@ -234,7 +240,7 @@ class TransactionRepositoryTest {
 
         int countBefore = transactionRepository.getAllByUserId(user.getId()).size();
 
-        transactionRepository.delete(tx2.getId());
+        transactionRepository.delete(tx2.getId(), 0L);
 
         int countAfter = transactionRepository.getAllByUserId(user.getId()).size();
 
@@ -246,7 +252,8 @@ class TransactionRepositoryTest {
     private static void compareTransactions(Transaction tx1, Transaction tx2) {
         assertThat(tx1)
                 .usingRecursiveComparison()
-                .ignoringFields("user")
+                .ignoringFields("user", "createdAt",
+                        "updatedAt", "deletedAt", "version")
                 .withComparatorForType(
                         Comparator.comparing((LocalDateTime d) -> d.truncatedTo(ChronoUnit.SECONDS)),
                         LocalDateTime.class

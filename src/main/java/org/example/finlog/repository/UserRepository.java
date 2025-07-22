@@ -22,7 +22,9 @@ public class UserRepository {
     public User getUserByEmail(String email) {
         try {
             return jdbcTemplate.queryForObject(
-                    "select * from user_ where email = ?",
+                    "select * from user_ " +
+                            "where email = ? " +
+                            "and deleted = false",
                     new BeanPropertyRowMapper<>(User.class),
                     email
             );
@@ -34,7 +36,9 @@ public class UserRepository {
     @Transactional
     public LocalDateTime getRegistrationDate(UUID id) {
         return jdbcTemplate.queryForObject(
-                "select registration_date from user_ where id = ?",
+                "select registration_date from user_ " +
+                        "where id = ? " +
+                        "and deleted = false",
                 LocalDateTime.class,
                 id
         );
@@ -43,13 +47,13 @@ public class UserRepository {
     @Transactional
     public void save(User user) {
         jdbcTemplate.update(
-                "Insert into user_ (id, name, email, password_hash, registration_date, soft_delete) values (?, ?, ?, ?, ?, ?)",
+                "Insert into user_ (id, name, email, password_hash, registration_date) " +
+                        "values (?, ?, ?, ?, ?)",
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getPasswordHash(),
-                user.getRegistrationDate(),
-                user.isSoftDelete()
+                user.getRegistrationDate()
         );
     }
 }

@@ -8,13 +8,17 @@ import java.util.UUID;
 public class UserDataFactory {
 
     public static User sampleUser(UUID id) {
+        LocalDateTime now = LocalDateTime.now();
         return User.builder()
                 .id(id)
                 .name("username")
                 .email("sample@email.com")
                 .passwordHash("password_hash")
-                .registrationDate(LocalDateTime.now())
-                .softDelete(false)
+                .registrationDate(now)
+                .deleted(false)
+                .version(0L)
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
     }
 

@@ -82,7 +82,7 @@ public class TransactionService {
         Transaction existing = getTransaction(id);
 
         checkOwnership(user, existing);
-        transactionRepository.delete(id);
+        transactionRepository.delete(id, existing.getVersion());
     }
 
     private void checkOwnership(User user, Transaction transaction) throws AccessDeniedException {

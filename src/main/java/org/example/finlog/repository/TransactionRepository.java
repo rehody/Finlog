@@ -23,8 +23,14 @@ public class TransactionRepository {
     @Transactional
     public List<Transaction> getFiltered(UUID userId, LocalDateTime startDate, LocalDateTime endDate) {
         return jdbcTemplate.query(
-                "select * from transaction_ where user_id = ? and " +
-                        "transaction_date between ? and ? order by transaction_date",
+                "select id, user_id, amount, description, " +
+                        "category, transaction_date, deleted, " +
+                        "version, created_at, updated_at, deleted_at " +
+                        "from transaction_ " +
+                        "where user_id = ? and " +
+                        "transaction_date between ? and ? " +
+                        "and deleted = false " +
+                        "order by transaction_date",
                 new BeanPropertyRowMapper<>(Transaction.class),
                 userId,
                 startDate,
@@ -35,8 +41,14 @@ public class TransactionRepository {
     @Transactional
     public List<Transaction> getFiltered(UUID userId, Category category, LocalDateTime startDate, LocalDateTime endDate) {
         return jdbcTemplate.query(
-                "select * from transaction_ where user_id = ? and category = ? " +
-                        "and transaction_date between ? and ? order by transaction_date",
+                "select id, user_id, amount, description, " +
+                        "category, transaction_date, deleted, " +
+                        "version, created_at, updated_at, deleted_at " +
+                        "from transaction_ " +
+                        "where user_id = ? and category = ? " +
+                        "and transaction_date between ? and ? " +
+                        "and deleted = false " +
+                        "order by transaction_date",
                 new BeanPropertyRowMapper<>(Transaction.class),
                 userId,
                 category.toString(),
@@ -49,7 +61,13 @@ public class TransactionRepository {
     @Transactional
     public List<Transaction> getAllByUserId(UUID userId) {
         return jdbcTemplate.query(
-                "select * from transaction_ where user_id = ? order by transaction_date",
+                "select id, user_id, amount, description, " +
+                        "category, transaction_date, deleted, " +
+                        "version, created_at, updated_at, deleted_at " +
+                        "from transaction_ " +
+                        "where user_id = ? " +
+                        "and deleted = false " +
+                        "order by transaction_date",
                 new BeanPropertyRowMapper<>(Transaction.class),
                 userId
         );
@@ -67,6 +85,7 @@ public class TransactionRepository {
                 transaction.getCategory().toString()
         );
     }
+
     @Transactional
     public void saveWithDate(UUID userId, Transaction transaction) {
         jdbcTemplate.update(
@@ -82,21 +101,29 @@ public class TransactionRepository {
     }
 
     @Transactional
-    public void delete(UUID id) {
+    public void delete(UUID id, Long version) {
         jdbcTemplate.update(
-                "delete from transaction_ where id = ?",
-                id
+                "update transaction_ set deleted = true, " +
+                        "deleted_at = now(), version = version + 1 " +
+                        "where id = ? " +
+                        "and version = ? " +
+                        "and deleted = false",
+                id,
+                version
         );
     }
 
     @Transactional
     public void update(Transaction transaction) {
         jdbcTemplate.update(
-                "update transaction_ set amount = ?, description = ?, category = ? where id = ?",
+                "update transaction_ set amount = ?, description = ?, category = ?," +
+                        " version = version + 1, updated_at = now() " +
+                        "where id = ? and version = ?",
                 transaction.getAmount(),
                 transaction.getDescription(),
                 transaction.getCategory().toString(),
-                transaction.getId()
+                transaction.getId(),
+                transaction.getVersion()
         );
     }
 
@@ -104,7 +131,11 @@ public class TransactionRepository {
     public Transaction getById(UUID id) {
         try {
             return jdbcTemplate.queryForObject(
-                    "select * from transaction_ where id = ?",
+                    "select id, user_id, amount, description, " +
+                            "category, transaction_date, deleted, " +
+                            "version, created_at, updated_at, deleted_at " +
+                            "from transaction_ " +
+                            "where id = ? and deleted = false",
                     new BeanPropertyRowMapper<>(Transaction.class),
                     id
             );

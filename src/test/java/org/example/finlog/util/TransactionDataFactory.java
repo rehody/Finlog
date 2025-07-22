@@ -21,6 +21,7 @@ public class TransactionDataFactory {
     }
 
     public static Transaction sampleTransaction(UUID id, User user) {
+        LocalDateTime now = LocalDateTime.now();
         return Transaction.builder()
                 .id(id)
                 .user(user)
@@ -28,7 +29,11 @@ public class TransactionDataFactory {
                 .amount(new BigDecimal("123.45"))
                 .description("Test description")
                 .category(Category.OTHER)
-                .transactionDate(LocalDateTime.now())
+                .transactionDate(now)
+                .deleted(false)
+                .version(0L)
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
     }
 

@@ -246,7 +246,7 @@ class TransactionServiceTest {
                         tx.getTransactionDate().equals(expectedTransactionDate)
         ));
 
-        verify(transactionRepository, never()).delete(any());
+        verify(transactionRepository, never()).delete(any(), any());
         verify(transactionRepository, never()).saveWithoutDate(any(), any());
     }
 
@@ -329,7 +329,7 @@ class TransactionServiceTest {
 
         transactionService.delete(user.getEmail(), txId);
 
-        verify(transactionRepository).delete(eq(txId));
+        verify(transactionRepository).delete(eq(txId), eq(0L));
 
         verify(transactionRepository, never()).update(any());
         verify(transactionRepository, never()).saveWithoutDate(any(), any());
@@ -365,7 +365,7 @@ class TransactionServiceTest {
         ).isInstanceOf(AccessDeniedException.class)
                 .hasMessageContaining("Access denied");
 
-        verify(transactionRepository, never()).delete(any());
+        verify(transactionRepository, never()).delete(any(), any());
     }
 
 
