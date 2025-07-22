@@ -2,6 +2,7 @@ package org.example.finlog.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,8 +50,28 @@ public class TransactionController {
             description = "Returns transactions with optional filters by category and date range",
             parameters = {
                     @Parameter(name = "category", description = "Transaction category", example = "FAST_FOOD"),
-                    @Parameter(name = "startDate", description = "Start date (ISO format)", example = "2025-07-20"),
-                    @Parameter(name = "endDate", description = "End date (ISO format)", example = "2026-01-01")
+                    @Parameter(name = "startDate", description = "Start date (ISO format, time is optional)",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Date only",
+                                            value = "2025-07-20"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Date with time",
+                                            value = "2025-07-20T19:37:05"
+                                    )}
+                    ),
+                    @Parameter(name = "endDate", description = "End date (ISO format, time is optional)",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Date only",
+                                            value = "2026-01-01"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Date with time",
+                                            value = "2025-01-01T00:00:00"
+                                    )}
+                    )
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered transactions"),
@@ -59,10 +80,8 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<List<TransactionResponse>> getFiltered(
             @RequestParam(name = "category", required = false) Category category,
-            @RequestParam(name = "startDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime startDate,
-            @RequestParam(name = "endDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime endDate,
+            @RequestParam(name = "startDate", required = false) LocalDateTime startDate,
+            @RequestParam(name = "endDate", required = false) LocalDateTime endDate,
             Principal principal
     ) {
         String username = principal.getName();
