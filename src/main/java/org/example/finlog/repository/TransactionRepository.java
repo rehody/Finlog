@@ -5,6 +5,7 @@ import org.example.finlog.enums.Category;
 import org.example.finlog.util.QueryResponse;
 import org.example.finlog.util.TransactionQueryFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -59,7 +60,6 @@ public class TransactionRepository {
         );
     }
 
-
     @Transactional
     public List<Transaction> getAllByUserId(UUID userId) {
         return jdbcTemplate.query(
@@ -87,7 +87,7 @@ public class TransactionRepository {
 
     @Transactional
     public void delete(UUID id, Long version) {
-        jdbcTemplate.update(
+        int affectedRows = jdbcTemplate.update(
                 "update transaction_ set deleted = true, " +
                         "deleted_at = now(), version = version + 1 " +
                         "where id = ? " +
@@ -96,11 +96,18 @@ public class TransactionRepository {
                 id,
                 version
         );
+
+        if (affectedRows == 0 && existsById(id)) {
+            throw new OptimisticLockingFailureException(
+                    "Failed to delete transaction " + id
+                            + " with version " + version
+            );
+        }
     }
 
     @Transactional
     public void update(Transaction transaction) {
-        jdbcTemplate.update(
+        int affectedRows = jdbcTemplate.update(
                 "update transaction_ set amount = ?, description = ?, category = ?," +
                         " version = version + 1, updated_at = now() " +
                         "where id = ? and version = ?",
@@ -110,6 +117,13 @@ public class TransactionRepository {
                 transaction.getId(),
                 transaction.getVersion()
         );
+
+        if (affectedRows == 0 && existsById(transaction.getId())) {
+            throw new OptimisticLockingFailureException(
+                    "Failed to update transaction " + transaction.getId()
+                            + "with version " + transaction.getVersion()
+            );
+        }
     }
 
     @Transactional
@@ -127,5 +141,14 @@ public class TransactionRepository {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    private boolean existsById(UUID id) {
+        return Boolean.TRUE.equals(
+                jdbcTemplate.queryForObject(
+                        "select exists(select 1 from transaction_ where id = ?)",
+                        Boolean.class,
+                        id
+                ));
     }
 }

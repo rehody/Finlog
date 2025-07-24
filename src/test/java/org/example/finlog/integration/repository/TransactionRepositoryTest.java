@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ImportTestcontainers(TestPostgresContainerConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -205,6 +207,23 @@ class TransactionRepositoryTest {
     }
 
     @Test
+    void update_shouldThrowsWhenVersionMismatch() {
+        UUID txId = UUID.randomUUID();
+        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+        transactionRepository.save(transaction);
+
+        transaction.setVersion(transaction.getVersion() + 1);
+
+        assertThatThrownBy(() ->
+            transactionRepository.update(transaction)
+        ).isInstanceOf(OptimisticLockingFailureException.class)
+                .hasMessageContaining(
+                        "Failed to update transaction " + transaction.getId()
+                                + "with version " + transaction.getVersion()
+                );
+    }
+
+    @Test
     void delete_shouldDeleteTransactionCorrectly() {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
@@ -247,6 +266,54 @@ class TransactionRepositoryTest {
         assertThat(countAfter).isEqualTo(countBefore - 1);
         assertThat(transactionRepository.getById(tx2.getId())).isEqualTo(null);
         compareTransactions(transactionRepository.getById(tx1.getId()), tx1);
+    }
+
+    @Test
+    void delete_shouldSoftDeleteAndIncrementVersion() {
+        UUID txId = UUID.randomUUID();
+        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+        transactionRepository.save(transaction);
+
+        Long version = transaction.getVersion();
+
+        transactionRepository.delete(txId, version);
+
+        Transaction deleted = transactionRepository.getById(txId);
+        assertThat(deleted).isNull();
+    }
+
+    @Test
+    void delete_shouldThrowsWhenVersionMismatch() {
+        UUID txId = UUID.randomUUID();
+        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+        transactionRepository.save(transaction);
+
+        assertThatThrownBy(() ->
+                transactionRepository.delete(txId, transaction.getVersion() + 1)
+        ).isInstanceOf(OptimisticLockingFailureException.class)
+                .hasMessageContaining(
+                        "Failed to delete transaction " + txId
+                                + " with version " + (transaction.getVersion() + 1)
+                );
+    }
+
+    @Test
+    void delete_shouldThrowsWhenAlreadyDeleted() {
+        UUID txId = UUID.randomUUID();
+        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+        transactionRepository.save(transaction);
+
+        Long version = transaction.getVersion();
+
+        transactionRepository.delete(txId, version);
+
+        assertThatThrownBy(() ->
+                transactionRepository.delete(txId, version + 1)
+        ).isInstanceOf(OptimisticLockingFailureException.class)
+                .hasMessageContaining(
+                        "Failed to delete transaction " + txId
+                                + " with version " + (transaction.getVersion() + 1)
+                );
     }
 
     private static void compareTransactions(Transaction tx1, Transaction tx2) {
