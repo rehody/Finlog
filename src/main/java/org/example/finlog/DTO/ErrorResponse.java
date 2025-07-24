@@ -1,10 +1,14 @@
 package org.example.finlog.DTO;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import java.time.Instant;
 
-@Getter
-@RequiredArgsConstructor
-public class ErrorResponse {
-    private final String message;
+public record ErrorResponse(
+        String code,
+        String message,
+        Instant timestamp,
+        String path
+) {
+    public ErrorResponse(String code, String message, String path) {
+        this(code, message, Instant.now(), path);
+    }
 }
