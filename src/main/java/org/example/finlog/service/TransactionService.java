@@ -36,9 +36,8 @@ public class TransactionService {
         if (endDate == null) endDate = LocalDateTime.now();
         if (startDate == null) startDate = LocalDateTime.MIN;
 
-
-        if (category == null) {
-            return transactionRepository.getFiltered(userId, startDate, endDate);
+        if (endDate.isBefore(startDate)) {
+            return List.of();
         }
 
         return transactionRepository.getFiltered(userId, category, startDate, endDate);
@@ -60,7 +59,6 @@ public class TransactionService {
         }
 
         Transaction transaction = TransactionMapper.mapToEntity(request, user);
-
         transactionRepository.save(transaction);
     }
 

@@ -80,7 +80,7 @@ class TransactionServiceTest {
 
         List<Transaction> expected = List.of(new Transaction());
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(transactionRepository.getFiltered(user.getId(), start, end)).thenReturn(expected);
+        when(transactionRepository.getFiltered(user.getId(), null, start, end)).thenReturn(expected);
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, start, end);
 
@@ -90,7 +90,7 @@ class TransactionServiceTest {
     @Test
     void getFilteredData_shouldUseDefaultValuesWhenDateIsNull() {
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(transactionRepository.getFiltered(any(), any(), any())).thenReturn(List.of());
+        when(transactionRepository.getFiltered(any(), any(), any(), any())).thenReturn(List.of());
 
         List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, null, null);
 
@@ -105,6 +105,17 @@ class TransactionServiceTest {
                 transactionService.getFilteredData("nope@example.com", null, null, null)
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("User not found");
+    }
+
+    @Test
+    void getFilteredData_shouldReturnEmptyListWhenStartDateAfterEndDate() {
+        when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user));
+        LocalDateTime startDate = LocalDateTime.of(2026, 1, 1, 0, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2025, 7, 24, 18, 27, 56);
+
+        List<Transaction> result = transactionService.getFilteredData(user.getEmail(), null, startDate, endDate);
+
+        assertThat(result).isEmpty();
     }
 
     @Test

@@ -95,6 +95,7 @@ class TransactionRepositoryTest {
 
         List<Transaction> filtered = transactionRepository.getFiltered(
                 user.getId(),
+                null,
                 LocalDateTime.of(2025, 9, 1, 10, 0),
                 LocalDateTime.of(2026, 1, 1, 0, 0)
         );
@@ -215,7 +216,7 @@ class TransactionRepositoryTest {
         transaction.setVersion(transaction.getVersion() + 1);
 
         assertThatThrownBy(() ->
-            transactionRepository.update(transaction)
+                transactionRepository.update(transaction)
         ).isInstanceOf(OptimisticLockingFailureException.class)
                 .hasMessageContaining(
                         "Failed to update transaction " + transaction.getId()

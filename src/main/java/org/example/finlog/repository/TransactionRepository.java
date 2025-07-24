@@ -24,39 +24,19 @@ public class TransactionRepository {
     }
 
     @Transactional
-    public List<Transaction> getFiltered(UUID userId, LocalDateTime startDate, LocalDateTime endDate) {
-        return jdbcTemplate.query(
-                "select id, user_id, amount, description, " +
-                        "category, transaction_date, deleted, " +
-                        "version, created_at, updated_at, deleted_at " +
-                        "from transaction_ " +
-                        "where user_id = ? and " +
-                        "transaction_date between ? and ? " +
-                        "and deleted = false " +
-                        "order by transaction_date",
-                new BeanPropertyRowMapper<>(Transaction.class),
-                userId,
-                startDate,
-                endDate
-        );
-    }
+    public List<Transaction> getFiltered(
+            UUID userId,
+            Category category,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    ) {
+        QueryResponse query = TransactionQueryFactory
+                .createGetFilteredQuery(userId, category, startDate, endDate);
 
-    @Transactional
-    public List<Transaction> getFiltered(UUID userId, Category category, LocalDateTime startDate, LocalDateTime endDate) {
         return jdbcTemplate.query(
-                "select id, user_id, amount, description, " +
-                        "category, transaction_date, deleted, " +
-                        "version, created_at, updated_at, deleted_at " +
-                        "from transaction_ " +
-                        "where user_id = ? and category = ? " +
-                        "and transaction_date between ? and ? " +
-                        "and deleted = false " +
-                        "order by transaction_date",
+                query.sql(),
                 new BeanPropertyRowMapper<>(Transaction.class),
-                userId,
-                category.toString(),
-                startDate,
-                endDate
+                query.params()
         );
     }
 
