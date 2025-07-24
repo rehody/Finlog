@@ -6,6 +6,7 @@ import org.example.finlog.entity.User;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
 import org.example.finlog.service.UserService;
+import org.example.finlog.util.UserDataFactory;
 import org.example.finlog.util.UuidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,19 +51,13 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        user = User.builder()
-                .id(userId)
-                .email("test@example.com")
-                .passwordHash("encodedPassword")
-                .name("Test User")
-                .build();
+        user = UserDataFactory.sampleUser(userId);
     }
 
     @Test
     void getUserByEmail_shouldReturnUserIfExists() {
-        when(userRepository.getUserByEmail("test@example.com")).thenReturn(user);
-
-        Optional<User> result = userService.getUserByEmail("test@example.com");
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+        Optional<User> result = userService.getUserByEmail(user.getEmail());
 
         assertThat(result).isPresent();
         assertThat(result.get()).isEqualTo(user);
@@ -71,7 +66,6 @@ class UserServiceTest {
     @Test
     void getUserByEmail_shouldReturnEmptyIfUserNotExists() {
         when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
-
         Optional<User> result = userService.getUserByEmail("unknown@example.com");
 
         assertThat(result).isEmpty();
@@ -126,8 +120,6 @@ class UserServiceTest {
         verify(userRepository).save(argThat(u ->
                 u.getName().equals("new@example.com")
         ));
-
-
     }
 
     @Test
@@ -136,7 +128,6 @@ class UserServiceTest {
                 .email(user.getEmail())
                 .password("plainPassword")
                 .build();
-
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
         when(passwordEncoder.matches("plainPassword", user.getPasswordHash())).thenReturn(true);
@@ -149,9 +140,10 @@ class UserServiceTest {
 
     @Test
     void login_shouldThrowWhenInvalidEmail() {
-        LoginRequest request = new LoginRequest();
-        request.setEmail("unknown@example.com");
-        request.setPassword("pass");
+        LoginRequest request = LoginRequest.builder()
+                .email("unknown@example.com")
+                .password("pass")
+                .build();
 
         when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
 
@@ -162,9 +154,10 @@ class UserServiceTest {
 
     @Test
     void login_shouldThrowWhenInvalidPassword() {
-        LoginRequest request = new LoginRequest();
-        request.setEmail(user.getEmail());
-        request.setPassword("wrongPassword");
+        LoginRequest request = LoginRequest.builder()
+                .email(user.getEmail())
+                .password("wrongPassword")
+                .build();
 
         when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
         when(passwordEncoder.matches("wrongPassword", user.getPasswordHash())).thenReturn(false);

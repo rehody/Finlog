@@ -40,9 +40,11 @@ public class UserService {
 
     public String register(RegisterRequest request) {
         String email = request.getEmail();
-        getUserByEmail(email).orElseThrow(() -> new UserAlreadyExistsException(
-                "User with email '" + email + "' already exists"
-        ));
+        if (getUserByEmail(email).isPresent()) {
+            throw new UserAlreadyExistsException(
+                    "User with email '" + email + "' already exists"
+            );
+        }
 
         if (request.getUsername() == null) {
             request.setUsername(email);
