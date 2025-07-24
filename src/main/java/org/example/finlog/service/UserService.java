@@ -3,6 +3,8 @@ package org.example.finlog.service;
 import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
 import org.example.finlog.entity.User;
+import org.example.finlog.exception.NotFoundException;
+import org.example.finlog.exception.UserAlreadyExistsException;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
 import org.example.finlog.util.UuidGenerator;
@@ -37,25 +39,31 @@ public class UserService {
     }
 
     public String register(RegisterRequest request) {
+        String email = request.getEmail();
+        getUserByEmail(email).orElseThrow(() -> new UserAlreadyExistsException(
+                "User with email '" + email + "' already exists"
+        ));
+
         if (request.getUsername() == null) {
-            request.setUsername(request.getEmail());
+            request.setUsername(email);
         }
 
         User user = mapToEntity(request);
 
         userRepository.save(user);
-        return jwtService.generateToken(user.getEmail());
+        return jwtService.generateToken(email);
     }
 
     public String login(LoginRequest request) {
-        User user = getUserByEmail(request.getEmail())
+        String email = request.getEmail();
+        User user = getUserByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new BadCredentialsException("Invalid credentials");
         }
 
-        return jwtService.generateToken(user.getEmail());
+        return jwtService.generateToken(email);
     }
 
     public User mapToEntity(RegisterRequest request) {

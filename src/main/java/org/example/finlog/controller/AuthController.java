@@ -10,7 +10,6 @@ import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
 import org.example.finlog.service.UserService;
 import org.example.finlog.util.ApiTag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,10 +51,6 @@ public class AuthController {
             })
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        if (userService.getUserByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
         String token = userService.register(request);
         log.info("User registered: {}", request.getEmail());
         return ResponseEntity.ok(new AuthResponse(token));

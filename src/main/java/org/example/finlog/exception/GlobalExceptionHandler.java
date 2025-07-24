@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error", ex);
 
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.INTERNAL_ERROR_CODE,
+                ErrorCode.INTERNAL_ERROR,
                 "Internal server error",
                 request.getDescription(false)
 
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
         }
 
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.BAD_REQUEST_CODE,
+                ErrorCode.BAD_REQUEST,
                 message,
                 request.getDescription(false)
         );
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
         log.warn("Validation failed: {}", msg);
 
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.VALIDATION_ERROR_CODE,
+                ErrorCode.VALIDATION_ERROR,
                 msg,
                 request.getDescription(false)
         );
@@ -98,12 +98,28 @@ public class GlobalExceptionHandler {
         log.debug("Not found: {}", ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.NOT_FOUND_CODE,
+                ErrorCode.NOT_FOUND,
                 ex.getMessage(),
                 request.getDescription(false)
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExist(
+            UserAlreadyExistsException ex,
+            WebRequest request
+    ) {
+        log.warn("Registration attempt failed: {}", ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+                ErrorCode.CONFLICT,
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -114,7 +130,7 @@ public class GlobalExceptionHandler {
         log.warn("Access denied: {}", ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.FORBIDDEN_CODE,
+                ErrorCode.FORBIDDEN,
                 ex.getMessage(),
                 request.getDescription(false)
         );
@@ -128,7 +144,7 @@ public class GlobalExceptionHandler {
             WebRequest request
     ) {
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.BAD_REQUEST_CODE,
+                ErrorCode.BAD_REQUEST,
                 ex.getMessage(),
                 request.getDescription(false)
         );
@@ -144,7 +160,7 @@ public class GlobalExceptionHandler {
         log.warn("Concurrency conflict detected: {}", ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-                ErrorCode.CONFLICT_CODE,
+                ErrorCode.CONFLICT,
                 ex.getMessage(),
                 request.getDescription(false)
         );
