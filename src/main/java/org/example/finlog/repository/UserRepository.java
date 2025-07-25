@@ -47,7 +47,8 @@ public class UserRepository {
     @Transactional
     public void save(User user) {
         jdbcTemplate.update(
-                "Insert into user_ (id, name, email, password_hash, registration_date) " +
+                "insert into user_ " +
+                        "(id, name, email, password_hash, registration_date) " +
                         "values (?, ?, ?, ?, ?)",
                 user.getId(),
                 user.getName(),

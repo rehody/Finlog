@@ -43,9 +43,7 @@ public class TransactionRepository {
     @Transactional
     public List<Transaction> getAllByUserId(UUID userId) {
         return jdbcTemplate.query(
-                "select id, user_id, amount, description, " +
-                        "category, transaction_date, deleted, " +
-                        "version, created_at, updated_at, deleted_at " +
+                "select * " +
                         "from transaction_ " +
                         "where user_id = ? " +
                         "and deleted = false " +
@@ -88,8 +86,8 @@ public class TransactionRepository {
     @Transactional
     public void update(Transaction transaction) {
         int affectedRows = jdbcTemplate.update(
-                "update transaction_ set amount = ?, description = ?, category = ?," +
-                        " version = version + 1, updated_at = now() " +
+                "update transaction_ set amount = ?, description = ?, category = ?, " +
+                        "version = version + 1, updated_at = now() " +
                         "where id = ? and version = ?",
                 transaction.getAmount(),
                 transaction.getDescription(),
@@ -110,9 +108,7 @@ public class TransactionRepository {
     public Transaction getById(UUID id) {
         try {
             return jdbcTemplate.queryForObject(
-                    "select id, user_id, amount, description, " +
-                            "category, transaction_date, deleted, " +
-                            "version, created_at, updated_at, deleted_at " +
+                    "select * " +
                             "from transaction_ " +
                             "where id = ? and deleted = false",
                     new BeanPropertyRowMapper<>(Transaction.class),

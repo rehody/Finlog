@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.example.finlog.enums.Category;
+import org.example.finlog.util.TableName;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ import java.util.UUID;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "transaction_")
+@Table(name = TableName.TRANSACTION)
 public class Transaction extends FinlogEntity{
 
     @ManyToOne

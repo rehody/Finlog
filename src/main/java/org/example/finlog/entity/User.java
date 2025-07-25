@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.finlog.util.TableName;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -20,8 +21,8 @@ import java.util.List;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user_")
-public class User extends FinlogEntity{
+@Table(name = TableName.USER)
+public class User extends FinlogEntity {
 
     @Column(unique = true, nullable = false)
     private String email;
