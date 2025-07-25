@@ -1,0 +1,76 @@
+tags:
+  - Transactions
+summary: Get filtered transactions
+description: Returns transactions with optional filters by category and date range
+operationId: getFiltered
+parameters:
+  - name: category
+    in: query
+    description: Transaction category
+    required: false
+    schema:
+      type: string
+      enum:
+        - BEAUTY
+        - DIGITAL_GOODS
+        - EDUCATION
+        - FAST_FOOD
+        - HOME_IMPROVEMENT
+        - MARKETPLACES
+        - MOBILE_SERVICES
+        - RESTAURANT
+        - STATIONERY
+        - SUPERMARKETS
+        - TELECOMMUNICATIONS
+        - TOP_UPS
+        - TRANSFERS
+        - TRANSPORT
+        - OTHER
+    example: FAST_FOOD
+  - name: startDate
+    in: query
+    description: Start date (ISO format, time is optional)
+    required: false
+    schema:
+      type: string
+      format: date-time
+    examples:
+      Date only:
+        description: Date only
+        value: '2025-07-20'
+      Date with time:
+        description: Date with time
+        value: '2025-07-20T19:37:05'
+  - name: endDate
+    in: query
+    description: End date (ISO format, time is optional)
+    required: false
+    schema:
+      type: string
+      format: date-time
+    examples:
+      Date only:
+        description: Date only
+        value: '2026-01-01'
+      Date with time:
+        description: Date with time
+        value: '2025-01-01T00:00:00'
+responses:
+  '200':
+    description: Successfully retrieved filtered transactions
+    content:
+      '*/*':
+        schema:
+          type: array
+          items:
+            $ref: '../../components/schemas/TransactionResponse.yml'
+  '404':
+    description: User not found
+    content:
+      '*/*':
+        schema:
+          type: array
+          items:
+            $ref: '../../components/schemas/TransactionResponse.yml'
+security:
+  - bearerAuth: []

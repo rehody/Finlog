@@ -1,0 +1,18 @@
+tags:
+  - Transactions
+summary: Create transaction
+description: Creates a new financial transaction
+operationId: create
+requestBody:
+  content:
+    application/json:
+      schema:
+        $ref: '../../components/schemas/TransactionRequest.yml'
+  required: true
+responses:
+  '200':
+    description: Transaction created successfully
+  '404':
+    description: User not found
+security:
+  - bearerAuth: []

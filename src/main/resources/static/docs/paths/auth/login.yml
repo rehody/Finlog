@@ -1,0 +1,25 @@
+post:
+  tags:
+    - Authentication
+  summary: User login
+  description: Authenticates user and returns JWT token
+  operationId: login
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/LoginRequest.yml'
+    required: true
+  responses:
+    '200':
+      description: Authenticated successfully
+      content:
+        '*/*':
+          schema:
+            $ref: '../../components/schemas/AuthResponse.yml'
+    '400':
+      description: Invalid credentials
+      content:
+        '*/*':
+          schema:
+            $ref: '../../components/schemas/AuthResponse.yml'

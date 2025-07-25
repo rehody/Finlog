@@ -1,0 +1,21 @@
+tags:
+  - Transactions
+summary: Delete transaction
+description: Deletes a transaction by ID
+operationId: delete
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+responses:
+  '204':
+    description: Transaction deleted successfully
+  '403':
+    description: Access denied for this user
+  '404':
+    description: Transaction or user not found
+security:
+  - bearerAuth: []

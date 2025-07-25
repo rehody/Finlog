@@ -1,0 +1,46 @@
+openapi: 3.1.1
+info:
+  title: Finlog OpenAPI
+  version: v0.0.1-BETA
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+tags:
+  - name: Authentication
+    description: User login and registration
+  - name: Transactions
+    description: Financial transaction management
+paths:
+  /auth/register:
+    $ref: './paths/auth/register.yml'
+  /auth/login:
+    $ref: './paths/auth/login.yml'
+  /api/transactions:
+    get:
+      $ref: './paths/transactions/getFiltered.yml'
+    post:
+      $ref: './paths/transactions/create.yml'
+    put:
+      $ref: './paths/transactions/update.yml'
+  /api/transactions/{id}:
+    get:
+      $ref: './paths/transactions/getSingle.yml'
+    delete:
+      $ref: './paths/transactions/delete.yml'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    TransactionRequest:
+      $ref: './components/schemas/TransactionRequest.yml'
+    RegisterRequest:
+      $ref: './components/schemas/RegisterRequest.yml'
+    AuthResponse:
+      $ref: './components/schemas/AuthResponse.yml'
+    LoginRequest:
+      $ref: './components/schemas/LoginRequest.yml'
+    TransactionResponse:
+      $ref: './components/schemas/TransactionResponse.yml'

@@ -1,11 +1,5 @@
 package org.example.finlog.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finlog.DTO.TransactionRequest;
@@ -14,8 +8,6 @@ import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
 import org.example.finlog.mapper.TransactionMapper;
 import org.example.finlog.service.TransactionService;
-import org.example.finlog.util.ApiTag;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,8 +28,6 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("api/transactions")
-@SecurityRequirement(name = "bearerAuth")
-@Tag(name = ApiTag.TRANSACTIONS, description = "Financial transaction management")
 public class TransactionController {
     private final TransactionService transactionService;
 
@@ -45,38 +35,6 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @Operation(
-            summary = "Get filtered transactions",
-            description = "Returns transactions with optional filters by category and date range",
-            parameters = {
-                    @Parameter(name = "category", description = "Transaction category", example = "FAST_FOOD"),
-                    @Parameter(name = "startDate", description = "Start date (ISO format, time is optional)",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Date only",
-                                            value = "2025-07-20"
-                                    ),
-                                    @ExampleObject(
-                                            name = "Date with time",
-                                            value = "2025-07-20T19:37:05"
-                                    )}
-                    ),
-                    @Parameter(name = "endDate", description = "End date (ISO format, time is optional)",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Date only",
-                                            value = "2026-01-01"
-                                    ),
-                                    @ExampleObject(
-                                            name = "Date with time",
-                                            value = "2025-01-01T00:00:00"
-                                    )}
-                    )
-            },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved filtered transactions"),
-                    @ApiResponse(responseCode = "404", description = "User not found")
-            })
     @GetMapping
     public ResponseEntity<List<TransactionResponse>> getFiltered(
             @RequestParam(name = "category", required = false) Category category,
@@ -104,15 +62,6 @@ public class TransactionController {
         return ResponseEntity.ok(responseList);
     }
 
-    @Operation(
-            summary = "Get single transaction",
-            description = "Returns a transaction by ID",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully retrieved a single transaction"),
-                    @ApiResponse(responseCode = "403", description = "Access denied for this user"),
-                    @ApiResponse(responseCode = "404", description = "Transaction or user not found")
-            }
-    )
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponse> getSingle(
             @PathVariable UUID id,
@@ -124,13 +73,6 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-            summary = "Create transaction",
-            description = "Creates a new financial transaction",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Transaction created successfully"),
-                    @ApiResponse(responseCode = "404", description = "User not found")
-            })
     @PostMapping
     public ResponseEntity<Void> create(
             @Valid @RequestBody TransactionRequest request,
@@ -142,14 +84,6 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Update transaction",
-            description = "Updates an existing transaction",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
-                    @ApiResponse(responseCode = "403", description = "Access denied for this user"),
-                    @ApiResponse(responseCode = "404", description = "Transaction or user not found")
-            })
     @PutMapping
     public ResponseEntity<Void> update(
             @Valid @RequestBody TransactionRequest request,
@@ -161,14 +95,6 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Delete transaction",
-            description = "Deletes a transaction by ID",
-            responses = {
-                    @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
-                    @ApiResponse(responseCode = "403", description = "Access denied for this user"),
-                    @ApiResponse(responseCode = "404", description = "Transaction or user not found")
-            })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable UUID id,
@@ -180,4 +106,3 @@ public class TransactionController {
         return ResponseEntity.noContent().build();
     }
 }
-

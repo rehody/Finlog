@@ -1,0 +1,25 @@
+post:
+  tags:
+    - Authentication
+  summary: User registration
+  description: Registers new user and returns JWT token
+  operationId: register
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/RegisterRequest.yml'
+    required: true
+  responses:
+    '200':
+      description: Registered successfully
+      content:
+        '*/*':
+          schema:
+            $ref: '../../components/schemas/AuthResponse.yml'
+    '400':
+      description: Email already exists
+      content:
+        '*/*':
+          schema:
+            $ref: '../../components/schemas/AuthResponse.yml'

@@ -1,7 +1,5 @@
 package org.example.finlog.security;
 
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,12 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        scheme = "bearer",
-        bearerFormat = "JWT"
-)
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -38,7 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/swagger-ui/**")
+                                "/swagger-ui/**",
+                                "/docs/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

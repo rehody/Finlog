@@ -32,6 +32,6 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-    url: /v3/api-docs
+    path: /swagger-ui
+    url: /docs/openapi-bundled.yml
+    disable-swagger-default-url: true

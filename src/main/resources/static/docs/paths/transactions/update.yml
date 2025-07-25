@@ -1,0 +1,20 @@
+tags:
+  - Transactions
+summary: Update transaction
+description: Updates an existing transaction
+operationId: update
+requestBody:
+  content:
+    application/json:
+      schema:
+        $ref: '../../components/schemas/TransactionRequest.yml'
+  required: true
+responses:
+  '200':
+    description: Transaction updated successfully
+  '403':
+    description: Access denied for this user
+  '404':
+    description: Transaction or user not found
+security:
+  - bearerAuth: []

@@ -1,0 +1,338 @@
+openapi: 3.1.1
+info:
+  title: Finlog OpenAPI
+  version: v0.0.1-BETA
+servers:
+  - url: 'http://localhost:8080'
+    description: Generated server url
+tags:
+  - name: Authentication
+    description: User login and registration
+  - name: Transactions
+    description: Financial transaction management
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      description: Registers new user and returns JWT token
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: Registered successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Email already exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates user and returns JWT token
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Authenticated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /api/transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Get filtered transactions
+      description: Returns transactions with optional filters by category and date range
+      operationId: getFiltered
+      parameters:
+        - name: category
+          in: query
+          description: Transaction category
+          required: false
+          schema:
+            type: string
+            enum:
+              - BEAUTY
+              - DIGITAL_GOODS
+              - EDUCATION
+              - FAST_FOOD
+              - HOME_IMPROVEMENT
+              - MARKETPLACES
+              - MOBILE_SERVICES
+              - RESTAURANT
+              - STATIONERY
+              - SUPERMARKETS
+              - TELECOMMUNICATIONS
+              - TOP_UPS
+              - TRANSFERS
+              - TRANSPORT
+              - OTHER
+          example: FAST_FOOD
+        - name: startDate
+          in: query
+          description: 'Start date (ISO format, time is optional)'
+          required: false
+          schema:
+            type: string
+            format: date-time
+          examples:
+            Date only:
+              description: Date only
+              value: '2025-07-20'
+            Date with time:
+              description: Date with time
+              value: '2025-07-20T19:37:05'
+        - name: endDate
+          in: query
+          description: 'End date (ISO format, time is optional)'
+          required: false
+          schema:
+            type: string
+            format: date-time
+          examples:
+            Date only:
+              description: Date only
+              value: '2026-01-01'
+            Date with time:
+              description: Date with time
+              value: '2025-01-01T00:00:00'
+      responses:
+        '200':
+          description: Successfully retrieved filtered transactions
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - Transactions
+      summary: Create transaction
+      description: Creates a new financial transaction
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Transaction created successfully
+        '404':
+          description: User not found
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - Transactions
+      summary: Update transaction
+      description: Updates an existing transaction
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '200':
+          description: Transaction updated successfully
+        '403':
+          description: Access denied for this user
+        '404':
+          description: Transaction or user not found
+      security:
+        - bearerAuth: []
+  '/api/transactions/{id}':
+    get:
+      tags:
+        - Transactions
+      summary: Get single transaction
+      description: Returns a transaction by ID
+      operationId: getSingle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved a single transaction
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '403':
+          description: Access denied for this user
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Transaction or user not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Transactions
+      summary: Delete transaction
+      description: Deletes a transaction by ID
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Transaction deleted successfully
+        '403':
+          description: Access denied for this user
+        '404':
+          description: Transaction or user not found
+      security:
+        - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    TransactionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        description:
+          type: string
+          maxLength: 150
+          minLength: 0
+        category:
+          type: string
+          enum:
+            - BEAUTY
+            - DIGITAL_GOODS
+            - EDUCATION
+            - FAST_FOOD
+            - HOME_IMPROVEMENT
+            - MARKETPLACES
+            - MOBILE_SERVICES
+            - RESTAURANT
+            - STATIONERY
+            - SUPERMARKETS
+            - TELECOMMUNICATIONS
+            - TOP_UPS
+            - TRANSFERS
+            - TRANSPORT
+            - OTHER
+        transactionDate:
+          type: string
+          format: date-time
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        description:
+          type: string
+        category:
+          type: string
+          enum:
+            - BEAUTY
+            - DIGITAL_GOODS
+            - EDUCATION
+            - FAST_FOOD
+            - HOME_IMPROVEMENT
+            - MARKETPLACES
+            - MOBILE_SERVICES
+            - RESTAURANT
+            - STATIONERY
+            - SUPERMARKETS
+            - TELECOMMUNICATIONS
+            - TOP_UPS
+            - TRANSFERS
+            - TRANSPORT
+            - OTHER
+        transactionDate:
+          type: string
+          format: date-time
