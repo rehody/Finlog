@@ -16,11 +16,10 @@ public class QueryParser {
         String escapedTable = QueryFormatter
                 .escapeIdentifier(statement.getTable());
 
-        query.append("SELECT ")
-                .append(formattedFields)
-                .append(" FROM ")
-                .append(escapedTable)
-                .append(" ");
+        query.append(SqlKeyWord.SELECT).append(" ")
+                .append(formattedFields).append(" ")
+                .append(SqlKeyWord.FROM).append(" ")
+                .append(escapedTable).append(" ");
 
         appendWhere(statement, query);
         appendOrderBy(statement, query);
@@ -36,14 +35,11 @@ public class QueryParser {
         String formattedValues = QueryFormatter.formatToSequence(statement.getValues());
         String escapedTable = QueryFormatter.escapeIdentifier(statement.getTable());
 
-        query.append("INSERT INTO ")
-                .append(escapedTable)
-                .append(" (")
-                .append(formattedFields)
-                .append(") ")
-                .append("VALUES (")
-                .append(formattedValues)
-                .append(") ");
+        query.append(SqlKeyWord.INSERT_INTO).append(" ")
+                .append(escapedTable).append(" (")
+                .append(formattedFields).append(") ")
+                .append(SqlKeyWord.VALUES).append(" (")
+                .append(formattedValues).append(") ");
 
         return query.toString().trim();
     }
@@ -52,7 +48,7 @@ public class QueryParser {
         Integer limit = statement.getLimit();
 
         if (limit != null)
-            query.append("LIMIT ")
+            query.append(SqlKeyWord.LIMIT).append(" ")
                     .append(QueryFormatter.escapeParameter(limit))
                     .append(" ");
     }
@@ -61,7 +57,7 @@ public class QueryParser {
         String orderBy = statement.getOrderBy();
 
         if (orderBy != null && !orderBy.isEmpty())
-            query.append("ORDER BY ")
+            query.append(SqlKeyWord.ORDER_BY).append(" ")
                     .append(QueryFormatter.escapeIdentifier(orderBy))
                     .append(" ");
     }

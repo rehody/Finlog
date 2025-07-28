@@ -14,6 +14,7 @@ import org.example.finlog.query_builder.util.QueryParser;
 import org.example.finlog.query_builder.statement.expression.BetweenExpression;
 import org.example.finlog.query_builder.statement.expression.ComparisonExpression;
 import org.example.finlog.query_builder.statement.node.SelectStatement;
+import org.example.finlog.query_builder.util.SqlKeyWord;
 
 public class SelectBuilder implements
         SelectStep, FromStep, ConditionStep,
@@ -75,7 +76,7 @@ public class SelectBuilder implements
     }
 
     private void appendComparison(Operation operation, Object value) {
-        currentLogical = currentLogical == null ? "WHERE" : currentLogical;
+        currentLogical = currentLogical == null ? SqlKeyWord.WHERE : currentLogical;
 
         statement.getWhere().add(new LogicalExpression(
                 currentLogical,
@@ -99,14 +100,14 @@ public class SelectBuilder implements
 
     @Override
     public ComparisonStep and(String field) {
-        currentLogical = "AND";
+        currentLogical = SqlKeyWord.AND;
         currentField = field;
         return this;
     }
 
     @Override
     public ComparisonStep or(String field) {
-        currentLogical = "OR";
+        currentLogical = SqlKeyWord.OR;
         currentField = field;
         return this;
     }

@@ -60,8 +60,10 @@ public class QueryFormatter {
     }
 
     private static String formatBetweenExpression(BetweenExpression e) {
-        return escapeIdentifier(e.field()) + " BETWEEN " +
-               escapeParameter(e.from()) + " AND " +
+        return escapeIdentifier(e.field()) + " " +
+               SqlKeyWord.BETWEEN + " " +
+               escapeParameter(e.from()) + " " +
+               SqlKeyWord.AND + " " +
                escapeParameter(e.to());
     }
 }
