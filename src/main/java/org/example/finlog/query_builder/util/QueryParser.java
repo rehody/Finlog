@@ -1,10 +1,10 @@
 package org.example.finlog.query_builder.util;
 
+import org.example.finlog.query_builder.ast.expression.LogicalExpression;
 import org.example.finlog.query_builder.ast.node.SelectStatement;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class QueryParser {
     public static String parseSelect(SelectStatement statement) {
@@ -23,19 +23,40 @@ public class QueryParser {
                 .append(escapedTable)
                 .append(" ");
 
-        if (!statement.getWhere().isEmpty()) {
-            query.append("WHERE ").append(statement.getWhere().stream()
-                    .map(QueryFormatter::formatExpression)
-                    .collect(Collectors.joining(" AND ")))
-                    .append(" ");
-        }
-
-        if (!statement.getOrderBy().isEmpty())
-            query.append("ORDER BY ").append(statement.getOrderBy()).append(" ");
-
-        if (statement.getLimit() != null)
-            query.append("LIMIT ").append(statement.getLimit()).append(" ");
+        appendWhere(statement, query);
+        appendOrderBy(statement, query);
+        appendLimit(statement, query);
 
         return query.toString().trim();
+    }
+
+    private static void appendLimit(SelectStatement statement, StringBuilder query) {
+        Integer limit = statement.getLimit();
+
+        if (limit != null)
+            query.append("LIMIT ")
+                    .append(QueryFormatter.escapeParameter(limit))
+                    .append(" ");
+    }
+
+    private static void appendOrderBy(SelectStatement statement, StringBuilder query) {
+        String orderBy = statement.getOrderBy();
+
+        if (orderBy != null && !orderBy.isEmpty())
+            query.append("ORDER BY ")
+                    .append(QueryFormatter.escapeIdentifier(orderBy))
+                    .append(" ");
+    }
+
+    private static void appendWhere(SelectStatement statement, StringBuilder query) {
+        List<LogicalExpression> where = statement.getWhere();
+
+        if (!where.isEmpty()) {
+            for (LogicalExpression e : where) {
+                query.append(e.logicalOperator()).append(" ")
+                        .append(QueryFormatter.formatExpression(e.comparison()))
+                        .append(" ");
+            }
+        }
     }
 }

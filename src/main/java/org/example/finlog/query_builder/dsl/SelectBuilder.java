@@ -1,5 +1,6 @@
 package org.example.finlog.query_builder.dsl;
 
+import org.example.finlog.query_builder.ast.expression.LogicalExpression;
 import org.example.finlog.query_builder.step.general.BuildStep;
 import org.example.finlog.query_builder.step.select.FromStep;
 import org.example.finlog.query_builder.step.select.LimitStep;
@@ -19,6 +20,7 @@ public class SelectBuilder implements
         ComparisonStep, LogicalStep, OrderStep, LimitStep, BuildStep {
     private final SelectStatement ast = new SelectStatement();
     private String currentField;
+    private String currentLogical;
 
     private SelectBuilder() {
     }
@@ -75,30 +77,38 @@ public class SelectBuilder implements
     }
 
     private void appendComparison(Operation operation, Object value) {
-        ast.getWhere().add(new ComparisonExpression(
-                currentField,
-                operation.getSign(),
-                value
-        ));
+        currentLogical = currentLogical == null ? "WHERE" : currentLogical;
+
+        ast.getWhere().add(new LogicalExpression(
+                currentLogical,
+                new ComparisonExpression(
+                        currentField,
+                        operation.getSign(),
+                        value
+                )));
     }
 
     @Override
     public LogicalStep between(Object from, Object to) {
-        ast.getWhere().add(new BetweenExpression(
-                currentField,
-                from, to
-        ));
+        ast.getWhere().add(new LogicalExpression(
+                currentLogical,
+                new BetweenExpression(
+                        currentField,
+                        from, to
+                )));
         return this;
     }
 
     @Override
     public ComparisonStep and(String field) {
+        currentLogical = "AND";
         currentField = field;
         return this;
     }
 
     @Override
     public ComparisonStep or(String field) {
+        currentLogical = "OR";
         currentField = field;
         return this;
     }
