@@ -76,4 +76,23 @@ public class SelectQueryBuilderTest {
 
         assertThat(query).isEqualTo(expected);
     }
+
+    @Test
+    void shouldSelectAllWhenZeroArgs() {
+        String expected = "SELECT * FROM \"table\"";
+
+        String query = SelectBuilder.builder()
+                .select()
+                .from("table")
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+//    This code won't compile - limit() can't come before where()
+//
+//    @Test
+//    void shouldNotCompileWhenLimitBeforeWhere() {
+//        SelectBuilder.builder().select().from("table").limit(10).where("id").eq(1);
+//    }
 }
