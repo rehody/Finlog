@@ -4,6 +4,9 @@ import org.example.finlog.query_builder.statement.expression.BetweenExpression;
 import org.example.finlog.query_builder.statement.expression.ComparisonExpression;
 import org.example.finlog.query_builder.statement.expression.Expression;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
 public class QueryFormatter {
     public static String escapeIdentifier(String identifier) {
         return "\"" + identifier.replace("\"", "\"\"") + "\"";
@@ -32,6 +35,21 @@ public class QueryFormatter {
         throw new RuntimeException(
                 "Unexpected expression " +
                 expression.getClass().getSimpleName()
+        );
+    }
+
+    public static String formatToSequence(Object[] values) {
+        Function<Object, String> func;
+        if (values instanceof String[]) {
+            func = obj -> QueryFormatter.escapeIdentifier((String) obj);
+        } else {
+            func = QueryFormatter::escapeParameter;
+        }
+
+        return String.join(", ",
+                Arrays.stream(values)
+                        .map(func)
+                        .toList()
         );
     }
 

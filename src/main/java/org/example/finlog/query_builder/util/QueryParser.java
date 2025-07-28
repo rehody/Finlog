@@ -4,17 +4,13 @@ import org.example.finlog.query_builder.statement.expression.LogicalExpression;
 import org.example.finlog.query_builder.statement.node.InsertStatement;
 import org.example.finlog.query_builder.statement.node.SelectStatement;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class QueryParser {
     public static String parseSelect(SelectStatement statement) {
         StringBuilder query = new StringBuilder();
 
-        String formattedFields = String.join(", ", Arrays.stream(statement.getFields())
-                .map(QueryFormatter::escapeIdentifier)
-                .toList());
-
+        String formattedFields = QueryFormatter.formatToSequence(statement.getFields());
         String escapedTable = QueryFormatter
                 .escapeIdentifier(statement.getTable());
 
@@ -34,14 +30,8 @@ public class QueryParser {
     public static String parseInsert(InsertStatement statement) {
         StringBuilder query = new StringBuilder();
 
-        String formattedFields = String.join(", ", Arrays.stream(statement.getFields())
-                .map(QueryFormatter::escapeIdentifier)
-                .toList());
-
-        String formattedValues = String.join(", ", Arrays.stream(statement.getValues())
-                .map(QueryFormatter::escapeParameter)
-                .toList());
-
+        String formattedFields = QueryFormatter.formatToSequence(statement.getFields());
+        String formattedValues = QueryFormatter.formatToSequence(statement.getValues());
         String escapedTable = QueryFormatter.escapeIdentifier(statement.getTable());
 
         query.append("INSERT INTO ")
