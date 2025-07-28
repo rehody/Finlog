@@ -10,7 +10,9 @@ public class QueryParser {
     public static String parseSelect(SelectStatement statement) {
         StringBuilder query = new StringBuilder();
 
-        String formattedFields = QueryFormatter.formatToSequence(statement.getFields());
+        String formattedFields = statement.getFields() == null ? "*" :
+                QueryFormatter.formatToSequence(statement.getFields());
+
         String escapedTable = QueryFormatter
                 .escapeIdentifier(statement.getTable());
 

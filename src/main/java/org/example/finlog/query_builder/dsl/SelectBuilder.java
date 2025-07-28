@@ -31,9 +31,7 @@ public class SelectBuilder implements
 
     @Override
     public FromStep select(String... fields) {
-        if (fields.length == 0) {
-            statement.setFields(new String[]{"*"});
-        } else {
+        if (fields.length != 0) {
             statement.setFields(fields);
         }
 
