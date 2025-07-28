@@ -1,6 +1,6 @@
 package org.example.finlog.query_builder.dsl;
 
-import org.example.finlog.query_builder.ast.expression.LogicalExpression;
+import org.example.finlog.query_builder.statement.expression.LogicalExpression;
 import org.example.finlog.query_builder.step.general.BuildStep;
 import org.example.finlog.query_builder.step.select.FromStep;
 import org.example.finlog.query_builder.step.select.LimitStep;
@@ -11,14 +11,14 @@ import org.example.finlog.query_builder.step.where.ConditionStep;
 import org.example.finlog.query_builder.step.where.LogicalStep;
 import org.example.finlog.query_builder.util.Operation;
 import org.example.finlog.query_builder.util.QueryParser;
-import org.example.finlog.query_builder.ast.expression.BetweenExpression;
-import org.example.finlog.query_builder.ast.expression.ComparisonExpression;
-import org.example.finlog.query_builder.ast.node.SelectStatement;
+import org.example.finlog.query_builder.statement.expression.BetweenExpression;
+import org.example.finlog.query_builder.statement.expression.ComparisonExpression;
+import org.example.finlog.query_builder.statement.node.SelectStatement;
 
 public class SelectBuilder implements
         SelectStep, FromStep, ConditionStep,
         ComparisonStep, LogicalStep, OrderStep, LimitStep, BuildStep {
-    private final SelectStatement ast = new SelectStatement();
+    private final SelectStatement statement = new SelectStatement();
     private String currentField;
     private String currentLogical;
 
@@ -32,9 +32,9 @@ public class SelectBuilder implements
     @Override
     public FromStep select(String... fields) {
         if (fields.length == 0) {
-            ast.setFields(new String[]{"*"});
+            statement.setFields(new String[]{"*"});
         } else {
-            ast.setFields(fields);
+            statement.setFields(fields);
         }
 
         return this;
@@ -42,7 +42,7 @@ public class SelectBuilder implements
 
     @Override
     public ConditionStep from(String table) {
-        ast.setTable(table);
+        statement.setTable(table);
         return this;
     }
 
@@ -79,7 +79,7 @@ public class SelectBuilder implements
     private void appendComparison(Operation operation, Object value) {
         currentLogical = currentLogical == null ? "WHERE" : currentLogical;
 
-        ast.getWhere().add(new LogicalExpression(
+        statement.getWhere().add(new LogicalExpression(
                 currentLogical,
                 new ComparisonExpression(
                         currentField,
@@ -90,7 +90,7 @@ public class SelectBuilder implements
 
     @Override
     public LogicalStep between(Object from, Object to) {
-        ast.getWhere().add(new LogicalExpression(
+        statement.getWhere().add(new LogicalExpression(
                 currentLogical,
                 new BetweenExpression(
                         currentField,
@@ -115,18 +115,18 @@ public class SelectBuilder implements
 
     @Override
     public LimitStep orderBy(String field) {
-        ast.setOrderBy(field);
+        statement.setOrderBy(field);
         return this;
     }
 
     @Override
     public BuildStep limit(int limit) {
-        ast.setLimit(limit);
+        statement.setLimit(limit);
         return this;
     }
 
     @Override
     public String build() {
-        return QueryParser.parseSelect(ast);
+        return QueryParser.parseSelect(statement);
     }
 }

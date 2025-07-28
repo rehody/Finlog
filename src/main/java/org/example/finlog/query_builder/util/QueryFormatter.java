@@ -1,8 +1,8 @@
 package org.example.finlog.query_builder.util;
 
-import org.example.finlog.query_builder.ast.expression.BetweenExpression;
-import org.example.finlog.query_builder.ast.expression.ComparisonExpression;
-import org.example.finlog.query_builder.ast.expression.Expression;
+import org.example.finlog.query_builder.statement.expression.BetweenExpression;
+import org.example.finlog.query_builder.statement.expression.ComparisonExpression;
+import org.example.finlog.query_builder.statement.expression.Expression;
 
 public class QueryFormatter {
     public static String escapeIdentifier(String identifier) {

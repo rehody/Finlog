@@ -1,8 +1,8 @@
-package org.example.finlog.query_builder.ast.node;
+package org.example.finlog.query_builder.statement.node;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.finlog.query_builder.ast.expression.LogicalExpression;
+import org.example.finlog.query_builder.statement.expression.LogicalExpression;
 
 import java.util.ArrayList;
 import java.util.List;

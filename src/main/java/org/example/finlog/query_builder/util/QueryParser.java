@@ -1,7 +1,8 @@
 package org.example.finlog.query_builder.util;
 
-import org.example.finlog.query_builder.ast.expression.LogicalExpression;
-import org.example.finlog.query_builder.ast.node.SelectStatement;
+import org.example.finlog.query_builder.statement.expression.LogicalExpression;
+import org.example.finlog.query_builder.statement.node.InsertStatement;
+import org.example.finlog.query_builder.statement.node.SelectStatement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,15 +11,15 @@ public class QueryParser {
     public static String parseSelect(SelectStatement statement) {
         StringBuilder query = new StringBuilder();
 
-        List<String> escapedFields = Arrays.stream(statement.getFields())
+        String formattedFields = String.join(", ", Arrays.stream(statement.getFields())
                 .map(QueryFormatter::escapeIdentifier)
-                .toList();
+                .toList());
 
         String escapedTable = QueryFormatter
                 .escapeIdentifier(statement.getTable());
 
         query.append("SELECT ")
-                .append(String.join(", ", escapedFields))
+                .append(formattedFields)
                 .append(" FROM ")
                 .append(escapedTable)
                 .append(" ");
@@ -26,6 +27,31 @@ public class QueryParser {
         appendWhere(statement, query);
         appendOrderBy(statement, query);
         appendLimit(statement, query);
+
+        return query.toString().trim();
+    }
+
+    public static String parseInsert(InsertStatement statement) {
+        StringBuilder query = new StringBuilder();
+
+        String formattedFields = String.join(", ", Arrays.stream(statement.getFields())
+                .map(QueryFormatter::escapeIdentifier)
+                .toList());
+
+        String formattedValues = String.join(", ", Arrays.stream(statement.getValues())
+                .map(QueryFormatter::escapeParameter)
+                .toList());
+
+        String escapedTable = QueryFormatter.escapeIdentifier(statement.getTable());
+
+        query.append("INSERT INTO ")
+                .append(escapedTable)
+                .append(" (")
+                .append(formattedFields)
+                .append(") ")
+                .append("VALUES (")
+                .append(formattedValues)
+                .append(") ");
 
         return query.toString().trim();
     }
