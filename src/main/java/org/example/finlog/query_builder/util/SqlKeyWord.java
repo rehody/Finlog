@@ -14,6 +14,8 @@ public class SqlKeyWord {
     public static final String BETWEEN = "BETWEEN";
     public static final String ORDER_BY = "ORDER BY";
     public static final String LIMIT = "LIMIT";
+    public static final String UPDATE = "UPDATE";
+    public static final String SET = "SET";
 
 }
 

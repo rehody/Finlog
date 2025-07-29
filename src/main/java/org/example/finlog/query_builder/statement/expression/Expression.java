@@ -1,6 +1,6 @@
 package org.example.finlog.query_builder.statement.expression;
 
-import org.example.finlog.query_builder.statement.node.QueryNode;
+import org.example.finlog.query_builder.statement.statement.Statement;
 
-public interface Expression extends QueryNode {
+public interface Expression extends Statement {
 }

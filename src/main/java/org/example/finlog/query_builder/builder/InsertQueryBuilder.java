@@ -1,18 +1,26 @@
-package org.example.finlog.query_builder.dsl;
+package org.example.finlog.query_builder.builder;
 
-import org.example.finlog.query_builder.statement.node.InsertStatement;
+import org.example.finlog.query_builder.statement.statement.InsertStatement;
 import org.example.finlog.query_builder.step.general.BuildStep;
 import org.example.finlog.query_builder.step.insert.FieldStep;
 import org.example.finlog.query_builder.step.insert.InsertStep;
-import org.example.finlog.query_builder.step.insert.ValueStep;
+import org.example.finlog.query_builder.step.general.ValueStep;
 import org.example.finlog.query_builder.util.QueryParser;
 
-public class InsertBuilder implements InsertStep, FieldStep, ValueStep, BuildStep {
+public class InsertQueryBuilder implements
+        InsertStep,
+        FieldStep,
+        ValueStep<BuildStep>,
+        BuildStep
+{
     private final InsertStatement statement = new InsertStatement();
     private int fieldsCount;
 
+    private InsertQueryBuilder() {
+    }
+
     public static InsertStep builder() {
-        return new InsertBuilder();
+        return new InsertQueryBuilder();
     }
 
     @Override
@@ -22,7 +30,7 @@ public class InsertBuilder implements InsertStep, FieldStep, ValueStep, BuildSte
     }
 
     @Override
-    public ValueStep fields(String... fields) {
+    public ValueStep<BuildStep> fields(String... fields) {
         if (fields.length == 0) {
             throw new IllegalStateException(
                     "Zero fields are not allowed"

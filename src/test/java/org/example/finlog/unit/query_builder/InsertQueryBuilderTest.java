@@ -1,6 +1,6 @@
 package org.example.finlog.unit.query_builder;
 
-import org.example.finlog.query_builder.dsl.InsertBuilder;
+import org.example.finlog.query_builder.builder.InsertQueryBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -14,7 +14,7 @@ public class InsertQueryBuilderTest {
                           "(\"f1\", \"f2\", \"f3\") " +
                           "VALUES (100, 'hello', 3.14)";
 
-        String query = InsertBuilder.builder()
+        String query = InsertQueryBuilder.builder()
                 .insertInto("table")
                 .fields("f1", "f2", "f3")
                 .values(100, "hello", 3.14)
@@ -26,7 +26,7 @@ public class InsertQueryBuilderTest {
     @Test
     void shouldThrowsWhenValuesNumberNotMatchFieldsNumber() {
         assertThatThrownBy(() ->
-                InsertBuilder.builder()
+                InsertQueryBuilder.builder()
                         .insertInto("table")
                         .fields("f1", "f2", "f3")
                         .values(1, 2, 3, 4)
@@ -41,7 +41,7 @@ public class InsertQueryBuilderTest {
     @Test
     void shouldThrowsWhenZeroFields() {
         assertThatThrownBy(() ->
-                InsertBuilder.builder()
+                InsertQueryBuilder.builder()
                         .insertInto("table")
                         .fields()
                         .values(1, 2, 3, 4)
@@ -57,7 +57,7 @@ public class InsertQueryBuilderTest {
 //
 //    @Test
 //    void shouldNotCompileWhenValuesBeforeInsertInto() {
-//        InsertBuilder.builder().values(1, 2, 3).insertInto("table");
+//        InsertQueryBuilder.builder().values(1, 2, 3).insertInto("table");
 //
 //    }
 }

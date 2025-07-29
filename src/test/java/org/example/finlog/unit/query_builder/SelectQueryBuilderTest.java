@@ -1,6 +1,6 @@
 package org.example.finlog.unit.query_builder;
 
-import org.example.finlog.query_builder.dsl.SelectBuilder;
+import org.example.finlog.query_builder.builder.SelectQueryBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -11,7 +11,7 @@ public class SelectQueryBuilderTest {
     void shouldBuildWithoutWhereClause() {
         String expected = "SELECT \"f1\", \"f2\", \"f3\" FROM \"table\"";
 
-        String query = SelectBuilder.builder()
+        String query = SelectQueryBuilder.builder()
                 .select("f1", "f2", "f3")
                 .from("table")
                 .build();
@@ -27,7 +27,7 @@ public class SelectQueryBuilderTest {
                           "AND \"f2\" BETWEEN 100 AND 200 " +
                           "OR \"f3\" < 'f4'";
 
-        String query = SelectBuilder.builder()
+        String query = SelectQueryBuilder.builder()
                 .select("f1", "f2", "f3")
                 .from("table")
                 .where("f1").eq(null)
@@ -44,7 +44,7 @@ public class SelectQueryBuilderTest {
                           "FROM \"table\" " +
                           "ORDER BY \"f1\" LIMIT 100";
 
-        String query = SelectBuilder.builder()
+        String query = SelectQueryBuilder.builder()
                 .select("f1", "f2", "f3")
                 .from("table")
                 .orderBy("f1")
@@ -64,7 +64,7 @@ public class SelectQueryBuilderTest {
                           "ORDER BY \"f1\" " +
                           "LIMIT 100";
 
-        String query = SelectBuilder.builder()
+        String query = SelectQueryBuilder.builder()
                 .select("f1", "f2", "f3")
                 .from("table")
                 .where("f1").eq(null)
@@ -81,7 +81,7 @@ public class SelectQueryBuilderTest {
     void shouldSelectAllWhenZeroArgs() {
         String expected = "SELECT * FROM \"table\"";
 
-        String query = SelectBuilder.builder()
+        String query = SelectQueryBuilder.builder()
                 .select()
                 .from("table")
                 .build();
@@ -93,6 +93,6 @@ public class SelectQueryBuilderTest {
 //
 //    @Test
 //    void shouldNotCompileWhenLimitBeforeWhere() {
-//        SelectBuilder.builder().select().from("table").limit(10).where("id").eq(1);
+//        SelectQueryBuilder.builder().select().from("table").limit(10).where("id").eq(1);
 //    }
 }
