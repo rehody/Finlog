@@ -1,10 +1,12 @@
 package org.example.finlog.unit.query_builder;
 
 import org.example.finlog.query_builder.builder.InsertQueryBuilder;
+import org.example.finlog.query_builder.util.RawExpression;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.example.finlog.query_builder.util.RawExpression.raw;
 
 public class InsertQueryBuilderTest {
 
@@ -52,6 +54,23 @@ public class InsertQueryBuilderTest {
                 );
     }
 
+    @Test
+    void shouldBuildWhenSetRawExpressionAsValue() {
+        String expected = "INSERT INTO \"table\" " +
+                          "(\"f1\", \"f2\", \"f3\") " +
+                          "VALUES ('foo + bar', GREATEST(1, 11), 3.14 * 41.3)";
+
+        String query = InsertQueryBuilder.builder()
+                .insertInto("table")
+                .fields("f1", "f2", "f3")
+                .values(
+                        "foo + bar", // should be escaped
+                        raw("GREATEST(1, 11)"),
+                        raw("3.14 * 41.3")
+                ).build();
+
+        assertThat(query).isEqualTo(expected);
+    }
 
 //    This code won't compile - values() can't come before insertInto()
 //

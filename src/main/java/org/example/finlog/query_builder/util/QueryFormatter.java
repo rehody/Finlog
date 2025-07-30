@@ -15,6 +15,8 @@ public class QueryFormatter {
     public static String escapeParameter(Object param) {
         if (param instanceof Number || param instanceof Boolean) {
             return param.toString();
+        } else if (param instanceof RawExpression) {
+            return ((RawExpression) param).expression();
         } else if (param == null) {
             return "NULL";
         }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.example.finlog.query_builder.util.RawExpression.raw;
 
 public class UpdateQueryBuilderTest {
 
@@ -65,6 +66,20 @@ public class UpdateQueryBuilderTest {
                         .build()
         ).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Zero fields are not allowed");
+    }
+
+    @Test
+    void shouldBuildWhenSetRawExpressionAsValue() {
+        String expected = "UPDATE \"table\" " +
+                          "SET \"f1\" = now(), \"f2\" = 'friday', \"f3\" = 13";
+
+        String query = UpdateQueryBuilder.builder()
+                .update("table")
+                .set("f1", "f2", "f3")
+                .values(raw("now()"), "friday", 13)
+                .build();
+
+        assertThat(query).isEqualTo(expected);
     }
 
 
