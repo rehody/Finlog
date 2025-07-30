@@ -3,5 +3,5 @@ package org.example.finlog.query_builder.step.select;
 import org.example.finlog.query_builder.step.general.BuildStep;
 
 public interface OrderStep extends LimitStep, BuildStep {
-    LimitStep orderBy(String field);
+    DirectionStep orderBy(String... field);
 }

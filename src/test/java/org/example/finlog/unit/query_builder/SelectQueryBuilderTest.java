@@ -1,6 +1,7 @@
 package org.example.finlog.unit.query_builder;
 
 import org.example.finlog.query_builder.builder.SelectQueryBuilder;
+import org.example.finlog.query_builder.util.OrderDirection;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -42,12 +43,14 @@ public class SelectQueryBuilderTest {
     void shouldBuildWithOrderAndLimitWithoutWhere() {
         String expected = "SELECT \"f1\", \"f2\", \"f3\" " +
                           "FROM \"table\" " +
-                          "ORDER BY \"f1\" LIMIT 100";
+                          "ORDER BY \"f1\" DESC " +
+                          "LIMIT 100";
 
         String query = SelectQueryBuilder.builder()
                 .select("f1", "f2", "f3")
                 .from("table")
                 .orderBy("f1")
+                .direction(OrderDirection.DESC)
                 .limit(100)
                 .build();
 
@@ -61,7 +64,7 @@ public class SelectQueryBuilderTest {
                           "WHERE \"f1\" = NULL " +
                           "AND \"f2\" BETWEEN 100 AND 200 " +
                           "OR \"f3\" != 'smth' " +
-                          "ORDER BY \"f1\" " +
+                          "ORDER BY \"f1\" ASC " +
                           "LIMIT 100";
 
         String query = SelectQueryBuilder.builder()
@@ -84,6 +87,22 @@ public class SelectQueryBuilderTest {
         String query = SelectQueryBuilder.builder()
                 .select()
                 .from("table")
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildWithSeveralOrderFields() {
+        String expected = "SELECT \"f1\", \"f2\", \"f3\" " +
+                          "FROM \"table\" " +
+                          "ORDER BY \"f3\", \"f1\", \"f2\" ASC";
+
+        String query = SelectQueryBuilder.builder()
+                .select("f1", "f2", "f3")
+                .from("table")
+                .orderBy("f3", "f1", "f2")
+//                .direction(OrderDirection.ASC) // will set ASC by default, so this is optional
                 .build();
 
         assertThat(query).isEqualTo(expected);

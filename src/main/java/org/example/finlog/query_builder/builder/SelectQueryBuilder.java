@@ -1,14 +1,12 @@
 package org.example.finlog.query_builder.builder;
 
 import org.example.finlog.query_builder.step.general.BuildStep;
-import org.example.finlog.query_builder.step.select.FromStep;
-import org.example.finlog.query_builder.step.select.LimitStep;
-import org.example.finlog.query_builder.step.select.OrderStep;
-import org.example.finlog.query_builder.step.select.SelectStep;
+import org.example.finlog.query_builder.step.select.*;
 import org.example.finlog.query_builder.step.where.ComparisonStep;
 import org.example.finlog.query_builder.step.where.ConditionStepForSelect;
 import org.example.finlog.query_builder.step.where.LogicalStepForSelect;
 import org.example.finlog.query_builder.util.Operation;
+import org.example.finlog.query_builder.util.OrderDirection;
 import org.example.finlog.query_builder.util.QueryParser;
 import org.example.finlog.query_builder.statement.statement.SelectStatement;
 import org.example.finlog.query_builder.util.SqlKeyWord;
@@ -21,9 +19,9 @@ public class SelectQueryBuilder extends AbstractBuilderHelperWhereClauseSupports
         ComparisonStep<LogicalStepForSelect>,
         LogicalStepForSelect,
         OrderStep,
+        DirectionStep,
         LimitStep,
-        BuildStep
-{
+        BuildStep {
     private final SelectStatement statement;
 
     private SelectQueryBuilder(SelectStatement statement) {
@@ -101,8 +99,14 @@ public class SelectQueryBuilder extends AbstractBuilderHelperWhereClauseSupports
     }
 
     @Override
-    public LimitStep orderBy(String field) {
+    public DirectionStep orderBy(String... field) {
         statement.setOrderBy(field);
+        return this;
+    }
+
+    @Override
+    public LimitStep direction(OrderDirection direction) {
+        statement.setOrderDirection(direction);
         return this;
     }
 

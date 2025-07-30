@@ -6,7 +6,9 @@ import org.example.finlog.query_builder.statement.statement.SelectStatement;
 import org.example.finlog.query_builder.statement.statement.AbstractStatementWhereClauseSupports;
 import org.example.finlog.query_builder.statement.statement.UpdateStatement;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueryParser {
     public static String parseSelect(SelectStatement statement) {
@@ -84,12 +86,15 @@ public class QueryParser {
     }
 
     private static void appendOrderBy(SelectStatement statement, StringBuilder query) {
-        String orderBy = statement.getOrderBy();
+        String[] orderBy = statement.getOrderBy();
 
-        if (orderBy != null && !orderBy.isEmpty())
+        if (orderBy != null && orderBy.length != 0) {
+            String escapedOrder = QueryFormatter.formatToSequence(orderBy);
             query.append(SqlKeyWord.ORDER_BY).append(" ")
-                    .append(QueryFormatter.escapeIdentifier(orderBy))
+                    .append(escapedOrder).append(" ")
+                    .append(statement.getOrderDirection().toString())
                     .append(" ");
+        }
     }
 
     private static void appendWhere(AbstractStatementWhereClauseSupports statement, StringBuilder query) {

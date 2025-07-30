@@ -1,8 +1,5 @@
 package org.example.finlog.query_builder.util;
 
-import lombok.Getter;
-
-@Getter
 public class SqlKeyWord {
     public static final String INSERT_INTO = "INSERT INTO";
     public static final String VALUES = "VALUES";
@@ -16,6 +13,5 @@ public class SqlKeyWord {
     public static final String LIMIT = "LIMIT";
     public static final String UPDATE = "UPDATE";
     public static final String SET = "SET";
-
 }
 
