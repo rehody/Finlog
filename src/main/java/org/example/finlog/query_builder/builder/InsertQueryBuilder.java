@@ -5,7 +5,7 @@ import org.example.finlog.query_builder.step.general.BuildStep;
 import org.example.finlog.query_builder.step.insert.FieldStep;
 import org.example.finlog.query_builder.step.insert.InsertStep;
 import org.example.finlog.query_builder.step.general.ValueStep;
-import org.example.finlog.query_builder.util.QueryParser;
+import org.example.finlog.query_builder.util.QuerySerializer;
 
 public class InsertQueryBuilder implements
         InsertStep,
@@ -56,6 +56,6 @@ public class InsertQueryBuilder implements
 
     @Override
     public String build() {
-        return QueryParser.parseInsert(statement);
+        return QuerySerializer.Parser.parseInsert(statement);
     }
 }

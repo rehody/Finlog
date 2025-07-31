@@ -9,7 +9,7 @@ import org.example.finlog.query_builder.step.where.ComparisonStep;
 import org.example.finlog.query_builder.step.where.ConditionStepForUpdate;
 import org.example.finlog.query_builder.step.where.LogicalStepForUpdate;
 import org.example.finlog.query_builder.util.Operation;
-import org.example.finlog.query_builder.util.QueryParser;
+import org.example.finlog.query_builder.util.QuerySerializer;
 import org.example.finlog.query_builder.util.SqlKeyWord;
 
 public class UpdateQueryBuilder extends AbstractBuilderHelperWhereClauseSupports
@@ -116,6 +116,6 @@ public class UpdateQueryBuilder extends AbstractBuilderHelperWhereClauseSupports
 
     @Override
     public String build() {
-        return QueryParser.parseUpdate(statement);
+        return QuerySerializer.Parser.parseUpdate(statement);
     }
 }

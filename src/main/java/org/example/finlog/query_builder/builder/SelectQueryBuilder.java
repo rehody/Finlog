@@ -7,7 +7,7 @@ import org.example.finlog.query_builder.step.where.ConditionStepForSelect;
 import org.example.finlog.query_builder.step.where.LogicalStepForSelect;
 import org.example.finlog.query_builder.util.Operation;
 import org.example.finlog.query_builder.util.OrderDirection;
-import org.example.finlog.query_builder.util.QueryParser;
+import org.example.finlog.query_builder.util.QuerySerializer;
 import org.example.finlog.query_builder.statement.statement.SelectStatement;
 import org.example.finlog.query_builder.util.SqlKeyWord;
 
@@ -118,6 +118,6 @@ public class SelectQueryBuilder extends AbstractBuilderHelperWhereClauseSupports
 
     @Override
     public String build() {
-        return QueryParser.parseSelect(statement);
+        return QuerySerializer.Parser.parseSelect(statement);
     }
 }
