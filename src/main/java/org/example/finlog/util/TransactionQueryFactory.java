@@ -2,6 +2,8 @@ package org.example.finlog.util;
 
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
+import org.example.finlog.query_builder.builder.InsertQueryBuilder;
+import org.example.finlog.query_builder.builder.SelectQueryBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,59 +11,50 @@ import java.util.List;
 import java.util.UUID;
 
 public class TransactionQueryFactory {
-    public static QueryResponse createSaveQuery(Transaction transaction) {
-        List<Object> params = new ArrayList<>();
-        StringBuilder fields = new StringBuilder("id, user_id, amount, description, category");
+    private final static String TABLE = TableName.TRANSACTION;
 
-        params.add(transaction.getId());
-        params.add(transaction.getUserId());
-        params.add(transaction.getAmount());
-        params.add(transaction.getDescription());
-        params.add(transaction.getCategory().toString());
+    public static String save(Transaction transaction) {
+        List<String> fields = new ArrayList<>(List.of(
+                "id", "user_id", "amount", "description", "category"
+        ));
+
+        List<Object> values = new ArrayList<>(List.of(
+                transaction.getId(),
+                transaction.getUserId(),
+                transaction.getAmount(),
+                transaction.getDescription(),
+                transaction.getCategory().toString()
+        ));
 
         if (transaction.getTransactionDate() != null) {
-            params.add(transaction.getTransactionDate());
-            fields.append(", transaction_date");
+            fields.add("transaction_date");
+            values.add(transaction.getTransactionDate());
         }
 
-
-        String query = "insert into transaction_ (" +
-                fields + ") values (" +
-                "?" + ", ?".repeat(params.size() - 1) + ")";
-
-        return new QueryResponse(query, params.toArray());
+        return InsertQueryBuilder.builder()
+                .insertInto(TABLE)
+                .fields(fields.toArray(new String[0]))
+                .values(values.toArray())
+                .build();
     }
 
-    public static QueryResponse createGetFilteredQuery(
+    public static String getFiltered(
             UUID userId,
             Category category,
             LocalDateTime startDate,
             LocalDateTime endDate
     ) {
-        List<Object> params = new ArrayList<>();
-        params.add(userId);
-
-        StringBuilder query = new StringBuilder(
-                "select id, user_id, amount, description, " +
-                        "category, transaction_date, deleted, " +
-                        "version, created_at, updated_at, deleted_at " +
-                        "from transaction_ " +
-                        "where user_id = ? "
-        );
+        var query = SelectQueryBuilder.builder()
+                .select()
+                .from(TABLE)
+                .where("user_id").eq(userId)
+                .and("transaction_date").between(startDate, endDate);
 
         if (category != null) {
-            query.append("and category = ? ");
-            params.add(category.toString());
+            query.and("category").eq(category);
         }
-        params.add(startDate);
-        params.add(endDate);
-        query.append(
-                "and transaction_date between ? and ? " +
-                        "and deleted = false " +
-                        "order by transaction_date"
-        );
 
-        return new QueryResponse(query.toString(), params.toArray());
+        return query.orderBy("transaction_date").build();
     }
 }
 
