@@ -2,12 +2,15 @@ package org.example.finlog.repository;
 
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
-import org.example.finlog.util.QueryResponse;
-import org.example.finlog.util.TransactionQueryFactory;
+import org.example.finlog.factory.transaction.query.TransactionDeleteFactory;
+import org.example.finlog.factory.transaction.query.TransactionInsertFactory;
+import org.example.finlog.factory.transaction.query.TransactionSelectFactory;
+import org.example.finlog.factory.transaction.query.TransactionUpdateFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,8 @@ import java.util.UUID;
 @Repository
 public class TransactionRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final RowMapper<Transaction> rowMapper =
+            new BeanPropertyRowMapper<>(Transaction.class);
 
     public TransactionRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -30,76 +35,46 @@ public class TransactionRepository {
             LocalDateTime startDate,
             LocalDateTime endDate
     ) {
-        QueryResponse query = TransactionQueryFactory
-                .createGetFilteredQuery(userId, category, startDate, endDate);
+        String query = TransactionSelectFactory
+                .getFiltered(userId, category, startDate, endDate);
 
-        return jdbcTemplate.query(
-                query.sql(),
-                new BeanPropertyRowMapper<>(Transaction.class),
-                query.params()
-        );
+        return jdbcTemplate.query(query, rowMapper);
     }
 
     @Transactional
     public List<Transaction> getAllByUserId(UUID userId) {
-        return jdbcTemplate.query(
-                "select * " +
-                        "from transaction_ " +
-                        "where user_id = ? " +
-                        "and deleted = false " +
-                        "order by transaction_date",
-                new BeanPropertyRowMapper<>(Transaction.class),
-                userId
-        );
+        String query = TransactionSelectFactory.getAllByUserId(userId);
+        return jdbcTemplate.query(query, rowMapper);
     }
 
     @Transactional
     public void save(Transaction transaction) {
-        QueryResponse query = TransactionQueryFactory.createSaveQuery(transaction);
-
-        jdbcTemplate.update(
-                query.sql(),
-                query.params()
-        );
+        String query = TransactionInsertFactory.save(transaction);
+        jdbcTemplate.update(query);
     }
 
     @Transactional
     public void delete(UUID id, Long version) {
-        int affectedRows = jdbcTemplate.update(
-                "update transaction_ set deleted = true, " +
-                        "deleted_at = now(), version = version + 1 " +
-                        "where id = ? " +
-                        "and version = ? " +
-                        "and deleted = false",
-                id,
-                version
-        );
+        String query = TransactionDeleteFactory.delete(id, version);
+        int affectedRows = jdbcTemplate.update(query);
 
         if (affectedRows == 0 && existsById(id)) {
             throw new OptimisticLockingFailureException(
                     "Failed to delete transaction " + id
-                            + " with version " + version
+                    + " with version " + version
             );
         }
     }
 
     @Transactional
     public void update(Transaction transaction) {
-        int affectedRows = jdbcTemplate.update(
-                "update transaction_ set amount = ?, description = ?, category = ?, " +
-                        "version = version + 1, updated_at = now() " +
-                        "where id = ? and version = ?",
-                transaction.getAmount(),
-                transaction.getDescription(),
-                transaction.getCategory().toString(),
-                transaction.getId(),
-                transaction.getVersion()
-        );
+        String query = TransactionUpdateFactory.update(transaction);
+        int affectedRows = jdbcTemplate.update(query);
 
         if (affectedRows == 0 && existsById(transaction.getId())) {
             throw new OptimisticLockingFailureException(
                     "Failed to update transaction " + transaction.getId()
-                            + "with version " + transaction.getVersion()
+                    + "with version " + transaction.getVersion()
             );
         }
     }
@@ -107,13 +82,8 @@ public class TransactionRepository {
     @Transactional
     public Transaction getById(UUID id) {
         try {
-            return jdbcTemplate.queryForObject(
-                    "select * " +
-                            "from transaction_ " +
-                            "where id = ? and deleted = false",
-                    new BeanPropertyRowMapper<>(Transaction.class),
-                    id
-            );
+            String query = TransactionSelectFactory.getById(id);
+            return jdbcTemplate.queryForObject(query, rowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
