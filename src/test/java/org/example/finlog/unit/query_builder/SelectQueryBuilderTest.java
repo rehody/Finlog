@@ -1,0 +1,117 @@
+package org.example.finlog.unit.query_builder;
+
+import org.example.finlog.query_builder.builder.SelectQueryBuilder;
+import org.example.finlog.query_builder.util.OrderDirection;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+public class SelectQueryBuilderTest {
+
+    @Test
+    void shouldBuildWithoutWhereClause() {
+        String expected = "SELECT \"f1\", \"f2\", \"f3\" FROM \"table\"";
+
+        String query = SelectQueryBuilder.builder()
+                .select("f1", "f2", "f3")
+                .from("table")
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildWithWhereClause() {
+        String expected = "SELECT \"f1\", \"f2\", \"f3\" " +
+                          "FROM \"table\" " +
+                          "WHERE \"f1\" = NULL " +
+                          "AND \"f2\" BETWEEN 100 AND 200 " +
+                          "OR \"f3\" < 'f4'";
+
+        String query = SelectQueryBuilder.builder()
+                .select("f1", "f2", "f3")
+                .from("table")
+                .where("f1").eq(null)
+                .and("f2").between(100, 200)
+                .or("f3").lessThan("f4")
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildWithOrderAndLimitWithoutWhere() {
+        String expected = "SELECT \"f1\", \"f2\", \"f3\" " +
+                          "FROM \"table\" " +
+                          "ORDER BY \"f1\" DESC " +
+                          "LIMIT 100";
+
+        String query = SelectQueryBuilder.builder()
+                .select("f1", "f2", "f3")
+                .from("table")
+                .orderBy("f1")
+                .direction(OrderDirection.DESC)
+                .limit(100)
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildWithWhereAndOrderByAndLimit() {
+        String expected = "SELECT \"f1\", \"f2\", \"f3\" " +
+                          "FROM \"table\" " +
+                          "WHERE \"f1\" = NULL " +
+                          "AND \"f2\" BETWEEN 100 AND 200 " +
+                          "OR \"f3\" != 'smth' " +
+                          "ORDER BY \"f1\" ASC " +
+                          "LIMIT 100";
+
+        String query = SelectQueryBuilder.builder()
+                .select("f1", "f2", "f3")
+                .from("table")
+                .where("f1").eq(null)
+                .and("f2").between(100, 200)
+                .or("f3").notEq("smth")
+                .orderBy("f1")
+                .limit(100)
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldSelectAllWhenZeroArgs() {
+        String expected = "SELECT * FROM \"table\"";
+
+        String query = SelectQueryBuilder.builder()
+                .select()
+                .from("table")
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildWithSeveralOrderFields() {
+        String expected = "SELECT \"f1\", \"f2\", \"f3\" " +
+                          "FROM \"table\" " +
+                          "ORDER BY \"f3\", \"f1\", \"f2\" ASC";
+
+        String query = SelectQueryBuilder.builder()
+                .select("f1", "f2", "f3")
+                .from("table")
+                .orderBy("f3", "f1", "f2")
+//                .direction(OrderDirection.ASC) // will set ASC by default, so this is optional
+                .build();
+
+        assertThat(query).isEqualTo(expected);
+    }
+
+//    This code won't compile - limit() can't come before where()
+//
+//    @Test
+//    void shouldNotCompileWhenLimitBeforeWhere() {
+//        SelectQueryBuilder.builder().select().from("table").limit(10).where("id").eq(1);
+//    }
+}
