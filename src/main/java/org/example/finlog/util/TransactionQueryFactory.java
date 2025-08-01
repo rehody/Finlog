@@ -63,7 +63,7 @@ public class TransactionQueryFactory {
     public static String getById(UUID id) {
         return SelectQueryBuilder.builder()
                 .select()
-                .from(TableName.TRANSACTION)
+                .from(TABLE)
                 .where("id").eq(id)
                 .and("deleted").eq(false)
                 .build();
@@ -71,7 +71,7 @@ public class TransactionQueryFactory {
 
     public static String update(Transaction transaction) {
         return UpdateQueryBuilder.builder()
-                .update(TableName.TRANSACTION)
+                .update(TABLE)
                 .set("amount", "description", "category", "version", "updated_at")
                 .values(
                         transaction.getAmount(),
@@ -87,7 +87,7 @@ public class TransactionQueryFactory {
 
     public static String delete(UUID id, Long version) {
         return UpdateQueryBuilder.builder()
-                .update(TableName.TRANSACTION)
+                .update(TABLE)
                 .set("deleted", "deleted_at", "version")
                 .values(
                         true,
@@ -102,7 +102,7 @@ public class TransactionQueryFactory {
     public static String getAllByUserId(UUID userId) {
         return SelectQueryBuilder.builder()
                 .select()
-                .from(TableName.TRANSACTION)
+                .from(TABLE)
                 .where("user_id").eq(userId)
                 .and("deleted").eq(false)
                 .orderBy("transaction_date")

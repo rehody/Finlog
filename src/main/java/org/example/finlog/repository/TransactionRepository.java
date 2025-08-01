@@ -2,14 +2,12 @@ package org.example.finlog.repository;
 
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
-import org.example.finlog.query_builder.builder.SelectQueryBuilder;
-import org.example.finlog.query_builder.builder.UpdateQueryBuilder;
-import org.example.finlog.util.TableName;
 import org.example.finlog.util.TransactionQueryFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +15,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.example.finlog.query_builder.util.RawExpression.raw;
-
 @Repository
 public class TransactionRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final RowMapper<Transaction> rowMapper =
+            new BeanPropertyRowMapper<>(Transaction.class);
 
     public TransactionRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -37,20 +35,13 @@ public class TransactionRepository {
         String query = TransactionQueryFactory
                 .getFiltered(userId, category, startDate, endDate);
 
-        return jdbcTemplate.query(
-                query,
-                new BeanPropertyRowMapper<>(Transaction.class)
-        );
+        return jdbcTemplate.query(query, rowMapper);
     }
 
     @Transactional
     public List<Transaction> getAllByUserId(UUID userId) {
         String query = TransactionQueryFactory.getAllByUserId(userId);
-
-        return jdbcTemplate.query(
-                query,
-                new BeanPropertyRowMapper<>(Transaction.class)
-        );
+        return jdbcTemplate.query(query, rowMapper);
     }
 
     @Transactional
@@ -89,11 +80,7 @@ public class TransactionRepository {
     public Transaction getById(UUID id) {
         try {
             String query = TransactionQueryFactory.getById(id);
-
-            return jdbcTemplate.queryForObject(
-                    query,
-                    new BeanPropertyRowMapper<>(Transaction.class)
-            );
+            return jdbcTemplate.queryForObject(query, rowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
