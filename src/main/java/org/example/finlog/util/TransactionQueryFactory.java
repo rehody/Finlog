@@ -91,10 +91,11 @@ public class TransactionQueryFactory {
                 .set("deleted", "deleted_at", "version")
                 .values(
                         true,
-                        raw("NOW"),
+                        raw("NOW()"),
                         raw("version + 1")
                 )
                 .where("id").eq(id)
+                .and("deleted").eq(false)
                 .and("version").eq(version)
                 .build();
     }
