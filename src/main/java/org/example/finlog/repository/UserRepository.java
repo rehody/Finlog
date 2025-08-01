@@ -1,7 +1,9 @@
 package org.example.finlog.repository;
 
 import org.example.finlog.entity.User;
-import org.example.finlog.util.UserQueryFactory;
+import org.example.finlog.factory.user.query.UserInsertFactory;
+import org.example.finlog.factory.user.query.UserQueryFactory;
+import org.example.finlog.factory.user.query.UserSelectFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,7 +27,7 @@ public class UserRepository {
     @Transactional
     public User getUserByEmail(String email) {
         try {
-            String query = UserQueryFactory.getByEmail(email);
+            String query = UserSelectFactory.getByEmail(email);
             return jdbcTemplate.queryForObject(query, rowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -34,13 +36,13 @@ public class UserRepository {
 
     @Transactional
     public LocalDateTime getRegistrationDate(UUID id) {
-        String query = UserQueryFactory.getSingleField("registration_date", id);
+        String query = UserSelectFactory.getSingleField("registration_date", id);
         return jdbcTemplate.queryForObject(query, LocalDateTime.class);
     }
 
     @Transactional
     public void save(User user) {
-        String query = UserQueryFactory.save(user);
+        String query = UserInsertFactory.save(user);
         jdbcTemplate.update(query);
     }
 }

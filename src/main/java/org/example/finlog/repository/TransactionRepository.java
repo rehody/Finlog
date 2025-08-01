@@ -2,7 +2,10 @@ package org.example.finlog.repository;
 
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
-import org.example.finlog.util.TransactionQueryFactory;
+import org.example.finlog.factory.transaction.query.TransactionDeleteFactory;
+import org.example.finlog.factory.transaction.query.TransactionInsertFactory;
+import org.example.finlog.factory.transaction.query.TransactionSelectFactory;
+import org.example.finlog.factory.transaction.query.TransactionUpdateFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -32,7 +35,7 @@ public class TransactionRepository {
             LocalDateTime startDate,
             LocalDateTime endDate
     ) {
-        String query = TransactionQueryFactory
+        String query = TransactionSelectFactory
                 .getFiltered(userId, category, startDate, endDate);
 
         return jdbcTemplate.query(query, rowMapper);
@@ -40,19 +43,19 @@ public class TransactionRepository {
 
     @Transactional
     public List<Transaction> getAllByUserId(UUID userId) {
-        String query = TransactionQueryFactory.getAllByUserId(userId);
+        String query = TransactionSelectFactory.getAllByUserId(userId);
         return jdbcTemplate.query(query, rowMapper);
     }
 
     @Transactional
     public void save(Transaction transaction) {
-        String query = TransactionQueryFactory.save(transaction);
+        String query = TransactionInsertFactory.save(transaction);
         jdbcTemplate.update(query);
     }
 
     @Transactional
     public void delete(UUID id, Long version) {
-        String query = TransactionQueryFactory.delete(id, version);
+        String query = TransactionDeleteFactory.delete(id, version);
         int affectedRows = jdbcTemplate.update(query);
 
         if (affectedRows == 0 && existsById(id)) {
@@ -65,7 +68,7 @@ public class TransactionRepository {
 
     @Transactional
     public void update(Transaction transaction) {
-        String query = TransactionQueryFactory.update(transaction);
+        String query = TransactionUpdateFactory.update(transaction);
         int affectedRows = jdbcTemplate.update(query);
 
         if (affectedRows == 0 && existsById(transaction.getId())) {
@@ -79,7 +82,7 @@ public class TransactionRepository {
     @Transactional
     public Transaction getById(UUID id) {
         try {
-            String query = TransactionQueryFactory.getById(id);
+            String query = TransactionSelectFactory.getById(id);
             return jdbcTemplate.queryForObject(query, rowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
