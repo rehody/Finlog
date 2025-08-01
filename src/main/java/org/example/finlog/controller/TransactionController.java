@@ -6,7 +6,7 @@ import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.DTO.TransactionResponse;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.enums.Category;
-import org.example.finlog.mapper.TransactionMapper;
+import org.example.finlog.util.TransactionMapper;
 import org.example.finlog.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

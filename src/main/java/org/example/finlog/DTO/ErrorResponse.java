@@ -1,6 +1,6 @@
 package org.example.finlog.DTO;
 
-import org.example.finlog.util.ErrorCode;
+import org.example.finlog.enums.ErrorCode;
 
 import java.time.Instant;
 

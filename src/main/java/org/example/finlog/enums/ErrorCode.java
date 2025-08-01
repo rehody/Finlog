@@ -1,4 +1,4 @@
-package org.example.finlog.util;
+package org.example.finlog.enums;
 
 import lombok.Getter;
 

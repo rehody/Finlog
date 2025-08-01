@@ -1,4 +1,4 @@
-package org.example.finlog.mapper;
+package org.example.finlog.util;
 
 import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.DTO.TransactionResponse;

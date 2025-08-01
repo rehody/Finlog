@@ -5,7 +5,7 @@ import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
 import org.example.finlog.enums.Category;
 import org.example.finlog.exception.NotFoundException;
-import org.example.finlog.mapper.TransactionMapper;
+import org.example.finlog.util.TransactionMapper;
 import org.example.finlog.repository.TransactionRepository;
 import org.example.finlog.util.UuidGenerator;
 import org.springframework.stereotype.Service;

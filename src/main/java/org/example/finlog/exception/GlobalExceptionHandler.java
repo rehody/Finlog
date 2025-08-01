@@ -2,7 +2,7 @@ package org.example.finlog.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.finlog.DTO.ErrorResponse;
-import org.example.finlog.util.ErrorCode;
+import org.example.finlog.enums.ErrorCode;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
