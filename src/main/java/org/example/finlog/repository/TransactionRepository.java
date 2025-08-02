@@ -45,12 +45,14 @@ public class TransactionRepository extends BaseRepository<Transaction> {
         return jdbcTemplate.query(query, rowMapper);
     }
 
+    @Override
     @Transactional
     public void save(Transaction transaction) {
         String query = TransactionInsertFactory.save(transaction);
         jdbcTemplate.update(query);
     }
 
+    @Override
     @Transactional
     public void delete(UUID id, Long version) {
         String query = TransactionDeleteFactory.delete(id, version);
@@ -63,6 +65,7 @@ public class TransactionRepository extends BaseRepository<Transaction> {
         );
     }
 
+    @Override
     @Transactional
     public void update(Transaction transaction) {
         String query = TransactionUpdateFactory.update(transaction);

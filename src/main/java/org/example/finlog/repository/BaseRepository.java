@@ -7,6 +7,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -18,6 +19,12 @@ public abstract class BaseRepository<T extends BaseEntity> {
 
     public abstract void save(T entity);
 
+    public abstract void update(T entity);
+
+    public abstract void delete(UUID id, Long version);
+
+
+    @Transactional
     public T getById(UUID id) {
         try {
             String query = BaseQueryFactory.getByField(table, "id", id);
