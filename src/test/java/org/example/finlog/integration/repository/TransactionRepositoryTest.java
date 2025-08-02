@@ -220,7 +220,7 @@ class TransactionRepositoryTest {
         ).isInstanceOf(OptimisticLockingFailureException.class)
                 .hasMessageContaining(
                         "Failed to update transaction " + transaction.getId()
-                                + "with version " + transaction.getVersion()
+                                + " with version " + transaction.getVersion()
                 );
     }
 

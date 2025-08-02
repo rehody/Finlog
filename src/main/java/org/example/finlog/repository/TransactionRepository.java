@@ -6,11 +6,9 @@ import org.example.finlog.factory.transaction.query.TransactionDeleteFactory;
 import org.example.finlog.factory.transaction.query.TransactionInsertFactory;
 import org.example.finlog.factory.transaction.query.TransactionSelectFactory;
 import org.example.finlog.factory.transaction.query.TransactionUpdateFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.OptimisticLockingFailureException;
+import org.example.finlog.util.TableName;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +17,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public class TransactionRepository {
-    private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<Transaction> rowMapper =
-            new BeanPropertyRowMapper<>(Transaction.class);
-
+public class TransactionRepository extends BaseRepository<Transaction> {
     public TransactionRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        super(
+                TableName.TRANSACTION,
+                jdbcTemplate,
+                new BeanPropertyRowMapper<>(Transaction.class)
+        );
     }
 
     @Transactional
@@ -58,12 +56,11 @@ public class TransactionRepository {
         String query = TransactionDeleteFactory.delete(id, version);
         int affectedRows = jdbcTemplate.update(query);
 
-        if (affectedRows == 0 && existsById(id)) {
-            throw new OptimisticLockingFailureException(
-                    "Failed to delete transaction " + id
-                    + " with version " + version
-            );
-        }
+        checkOptimisticLock(
+                affectedRows, id,
+                "Failed to delete transaction " + id
+                + " with version " + version
+        );
     }
 
     @Transactional
@@ -71,30 +68,11 @@ public class TransactionRepository {
         String query = TransactionUpdateFactory.update(transaction);
         int affectedRows = jdbcTemplate.update(query);
 
-        if (affectedRows == 0 && existsById(transaction.getId())) {
-            throw new OptimisticLockingFailureException(
-                    "Failed to update transaction " + transaction.getId()
-                    + "with version " + transaction.getVersion()
-            );
-        }
-    }
-
-    @Transactional
-    public Transaction getById(UUID id) {
-        try {
-            String query = TransactionSelectFactory.getById(id);
-            return jdbcTemplate.queryForObject(query, rowMapper);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-
-    private boolean existsById(UUID id) {
-        return Boolean.TRUE.equals(
-                jdbcTemplate.queryForObject(
-                        "select exists(select 1 from transaction_ where id = ?)",
-                        Boolean.class,
-                        id
-                ));
+        checkOptimisticLock(
+                affectedRows,
+                transaction.getId(),
+                "Failed to update transaction " + transaction.getId()
+                + " with version " + transaction.getVersion()
+        );
     }
 }

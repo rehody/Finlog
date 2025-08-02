@@ -1,12 +1,11 @@
 package org.example.finlog.factory.transaction.query;
 
 import org.example.finlog.entity.Transaction;
-import org.example.finlog.query_builder.builder.InsertQueryBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionInsertFactory extends TransactionQueryFactory{
+public class TransactionInsertFactory extends TransactionQueryFactory {
 
     public static String save(Transaction transaction) {
         List<String> fields = new ArrayList<>(List.of(
@@ -26,10 +25,10 @@ public class TransactionInsertFactory extends TransactionQueryFactory{
             values.add(transaction.getTransactionDate());
         }
 
-        return InsertQueryBuilder.builder()
-                .insertInto(TABLE)
-                .fields(fields.toArray(new String[0]))
-                .values(values.toArray())
-                .build();
+        return save(
+                TABLE,
+                fields.toArray(String[]::new),
+                values.toArray()
+        );
     }
 }

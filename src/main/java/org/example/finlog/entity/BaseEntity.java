@@ -16,7 +16,7 @@ import java.util.UUID;
 @MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
-public class FinlogEntity {
+public class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

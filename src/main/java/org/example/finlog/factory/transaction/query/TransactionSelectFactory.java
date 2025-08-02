@@ -27,15 +27,6 @@ public class TransactionSelectFactory extends TransactionQueryFactory{
         return query.orderBy("transaction_date").build();
     }
 
-    public static String getById(UUID id) {
-        return SelectQueryBuilder.builder()
-                .select()
-                .from(TABLE)
-                .where("id").eq(id)
-                .and("deleted").eq(false)
-                .build();
-    }
-
     public static String getAllByUserId(UUID userId) {
         return SelectQueryBuilder.builder()
                 .select()

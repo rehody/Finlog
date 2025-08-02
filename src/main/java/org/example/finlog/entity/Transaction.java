@@ -27,7 +27,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = TableName.TRANSACTION)
-public class Transaction extends FinlogEntity{
+public class Transaction extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(

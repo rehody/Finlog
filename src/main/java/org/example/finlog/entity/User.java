@@ -22,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = TableName.USER)
-public class User extends FinlogEntity {
+public class User extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String email;
