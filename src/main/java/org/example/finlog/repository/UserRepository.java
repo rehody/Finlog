@@ -18,7 +18,6 @@ public class UserRepository extends BaseRepository<User>{
         public UserRepository(JdbcTemplate jdbcTemplate) {
         super(
                 TableName.USER,
-                User.class,
                 jdbcTemplate,
                 new BeanPropertyRowMapper<>(User.class)
         );

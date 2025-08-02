@@ -13,7 +13,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public abstract class BaseRepository<T extends BaseEntity> {
     protected final String table;
-    protected final Class<T> entityClass;
     protected final JdbcTemplate jdbcTemplate;
     protected final RowMapper<T> rowMapper;
 

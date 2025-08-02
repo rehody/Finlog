@@ -21,7 +21,6 @@ public class TransactionRepository extends BaseRepository<Transaction> {
     public TransactionRepository(JdbcTemplate jdbcTemplate) {
         super(
                 TableName.TRANSACTION,
-                Transaction.class,
                 jdbcTemplate,
                 new BeanPropertyRowMapper<>(Transaction.class)
         );
