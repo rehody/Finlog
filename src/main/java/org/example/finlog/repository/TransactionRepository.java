@@ -7,7 +7,6 @@ import org.example.finlog.factory.transaction.query.TransactionInsertFactory;
 import org.example.finlog.factory.transaction.query.TransactionSelectFactory;
 import org.example.finlog.factory.transaction.query.TransactionUpdateFactory;
 import org.example.finlog.util.TableName;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -76,15 +75,5 @@ public class TransactionRepository extends BaseRepository<Transaction> {
                 "Failed to update transaction " + transaction.getId()
                 + " with version " + transaction.getVersion()
         );
-    }
-
-    @Transactional
-    public Transaction getById(UUID id) {
-        try {
-            String query = TransactionSelectFactory.getById(id);
-            return jdbcTemplate.queryForObject(query, rowMapper);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
     }
 }

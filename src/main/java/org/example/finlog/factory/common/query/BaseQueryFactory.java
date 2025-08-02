@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public abstract class BaseQueryFactory {
 
-    protected static String save(String table, String[] fields, Object[] values) {
+    public static String save(String table, String[] fields, Object[] values) {
         return InsertQueryBuilder.builder()
                 .insertInto(table)
                 .fields(fields)
@@ -15,7 +15,7 @@ public abstract class BaseQueryFactory {
                 .build();
     }
 
-    protected static String getByField(String table, String field, Object value) {
+    public static String getByField(String table, String field, Object value) {
         return SelectQueryBuilder.builder()
                 .select()
                 .from(table)
@@ -24,7 +24,7 @@ public abstract class BaseQueryFactory {
                 .build();
     }
 
-    protected static String getSingleField(String table, String field, UUID id) {
+    public static String getSingleField(String table, String field, UUID id) {
         return SelectQueryBuilder.builder()
                 .select(field)
                 .from(table)
