@@ -19,7 +19,7 @@ public class TransactionMapper {
                 .build();
     }
 
-    public static Transaction mapToEntity(TransactionRequest request, User user) {
+    public static Transaction mapToEntity(TransactionRequest request, Long version, User user) {
         return Transaction.builder()
                 .id(request.getId())
                 .user(user)
@@ -28,6 +28,7 @@ public class TransactionMapper {
                 .description(request.getDescription())
                 .category(request.getCategory())
                 .transactionDate(request.getTransactionDate())
+                .version(version)
                 .build();
     }
 }

@@ -10,10 +10,11 @@ import java.util.UUID;
 
 public class UserMapper {
 
-    public static User mapToEntity(UserRequest request) {
+    public static User mapToEntity(UserRequest request, Long version) {
         return User.builder()
                 .id(request.getId())
                 .name(request.getName())
+                .version(version)
                 .build();
     }
 

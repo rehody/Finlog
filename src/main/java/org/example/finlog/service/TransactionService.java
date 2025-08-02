@@ -6,8 +6,8 @@ import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
 import org.example.finlog.enums.Category;
 import org.example.finlog.exception.NotFoundException;
-import org.example.finlog.util.TransactionMapper;
 import org.example.finlog.repository.TransactionRepository;
+import org.example.finlog.util.TransactionMapper;
 import org.example.finlog.util.UuidGenerator;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,8 @@ public class TransactionService {
             request.setId(uuidGenerator.generate());
         }
 
-        Transaction transaction = TransactionMapper.mapToEntity(request, user);
+        Long version = transactionRepository.getVersion(request.getId());
+        Transaction transaction = TransactionMapper.mapToEntity(request, version, user);
         transactionRepository.save(transaction);
     }
 
@@ -67,7 +68,7 @@ public class TransactionService {
         Transaction existing = getTransaction(request.getId());
 
         checkOwnership(user, existing);
-        Transaction transaction = TransactionMapper.mapToEntity(request, user);
+        Transaction transaction = TransactionMapper.mapToEntity(request, existing.getVersion(), user);
         transactionRepository.update(transaction);
     }
 

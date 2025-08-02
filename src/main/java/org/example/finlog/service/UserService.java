@@ -36,13 +36,14 @@ public class UserService {
     }
 
     public void update(UserRequest request) {
-        User user = UserMapper.mapToEntity(request);
+        Long version = userRepository.getVersion(request.getId());
+        User user = UserMapper.mapToEntity(request, version);
         userRepository.update(user);
     }
 
     public void delete(UUID id) {
-        User existing = getUser(id);
-        userRepository.delete(id, existing.getVersion());
+        Long version = userRepository.getVersion(id);
+        userRepository.delete(id, version);
     }
 
     public String register(RegisterRequest request) {

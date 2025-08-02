@@ -34,6 +34,12 @@ public abstract class BaseRepository<T extends BaseEntity> {
         }
     }
 
+    @Transactional
+    public Long getVersion(UUID id) {
+        String query = BaseQueryFactory.getSingleField(table, "version", id);
+        return jdbcTemplate.queryForObject(query, Long.class);
+    }
+
     protected void checkOptimisticLock(int affectedRows, UUID id, String message) {
         if (affectedRows == 0 && existsById(id)) {
             throw new OptimisticLockingFailureException(message);
