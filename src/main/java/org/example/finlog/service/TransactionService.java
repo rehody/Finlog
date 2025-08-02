@@ -1,5 +1,6 @@
 package org.example.finlog.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.finlog.DTO.TransactionRequest;
 import org.example.finlog.entity.Transaction;
 import org.example.finlog.entity.User;
@@ -17,24 +18,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserService userService;
     private final UuidGenerator uuidGenerator;
 
-
-    public TransactionService(TransactionRepository transactionRepository, UserService userService, UuidGenerator uuidGenerator) {
-        this.transactionRepository = transactionRepository;
-        this.userService = userService;
-        this.uuidGenerator = uuidGenerator;
-    }
-
-    public List<Transaction> getFilteredData(String username, Category category, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Transaction> getFilteredData(
+            String username,
+            Category category,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    ) {
         User user = getUser(username);
         UUID userId = user.getId();
 
         if (endDate == null) endDate = LocalDateTime.now();
-        if (startDate == null) startDate = LocalDateTime.MIN;
+        if (startDate == null) startDate = LocalDateTime.of(1970, 1, 1, 0, 0);
 
         if (endDate.isBefore(startDate)) {
             return List.of();
@@ -90,8 +90,8 @@ public class TransactionService {
                 .orElseThrow(() -> new NotFoundException("User not found: " + username));
     }
 
-    private Transaction getTransaction(UUID request) {
-        return Optional.ofNullable(transactionRepository.getById(request))
+    private Transaction getTransaction(UUID id) {
+        return Optional.ofNullable(transactionRepository.getById(id))
                 .orElseThrow(() -> new NotFoundException("Transaction not found"));
     }
 }

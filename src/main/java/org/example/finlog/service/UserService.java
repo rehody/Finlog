@@ -1,12 +1,15 @@
 package org.example.finlog.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
+import org.example.finlog.DTO.UserRequest;
 import org.example.finlog.entity.User;
 import org.example.finlog.exception.NotFoundException;
 import org.example.finlog.exception.UserAlreadyExistsException;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
+import org.example.finlog.util.UserMapper;
 import org.example.finlog.util.UuidGenerator;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,18 +20,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UuidGenerator uuidGenerator;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, UuidGenerator uuidGenerator) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-        this.uuidGenerator = uuidGenerator;
-    }
 
     public Optional<User> getUserByEmail(String email) {
         return Optional.ofNullable(userRepository.getUserByEmail(email));
@@ -36,6 +33,16 @@ public class UserService {
 
     public LocalDateTime getRegistrationDate(UUID id) {
         return userRepository.getRegistrationDate(id);
+    }
+
+    public void update(UserRequest request) {
+        User user = UserMapper.mapToEntity(request);
+        userRepository.update(user);
+    }
+
+    public void delete(UUID id) {
+        User existing = getUser(id);
+        userRepository.delete(id, existing.getVersion());
     }
 
     public String register(RegisterRequest request) {
@@ -50,7 +57,11 @@ public class UserService {
             request.setUsername(email);
         }
 
-        User user = mapToEntity(request);
+        User user = UserMapper.mapToEntity(
+                request,
+                uuidGenerator.generate(),
+                passwordEncoder.encode(request.getPassword())
+        );
 
         userRepository.save(user);
         return jwtService.generateToken(email);
@@ -68,13 +79,8 @@ public class UserService {
         return jwtService.generateToken(email);
     }
 
-    public User mapToEntity(RegisterRequest request) {
-        return User.builder()
-                .id(uuidGenerator.generate())
-                .name(request.getUsername())
-                .email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .registrationDate(LocalDateTime.now())
-                .build();
+    private User getUser(UUID id) {
+        return Optional.ofNullable(userRepository.getById(id))
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }
