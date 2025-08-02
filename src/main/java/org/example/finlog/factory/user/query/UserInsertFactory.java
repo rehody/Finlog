@@ -1,9 +1,6 @@
 package org.example.finlog.factory.user.query;
 
 import org.example.finlog.entity.User;
-import org.example.finlog.factory.common.query.BaseQueryFactory;
-import org.example.finlog.query_builder.builder.InsertQueryBuilder;
-import org.example.finlog.util.TableName;
 
 public class UserInsertFactory extends UserQueryFactory {
     public static String save(User user) {
