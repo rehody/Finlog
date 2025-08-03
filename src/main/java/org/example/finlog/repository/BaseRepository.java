@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -32,6 +33,12 @@ public abstract class BaseRepository<T extends BaseEntity> {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    @Transactional
+    public List<T> getAll() {
+        String query = BaseQueryFactory.getAll(table);
+        return jdbcTemplate.query(query, rowMapper);
     }
 
     @Transactional

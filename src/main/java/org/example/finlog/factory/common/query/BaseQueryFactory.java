@@ -34,6 +34,14 @@ public abstract class BaseQueryFactory {
                 .build();
     }
 
+    public static String getAll(String table) {
+        return SelectQueryBuilder.builder()
+                .select()
+                .from(table)
+                .where("deleted").eq(false)
+                .build();
+    }
+
 
 //    *** INSERT SECTION ***
 

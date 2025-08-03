@@ -66,7 +66,7 @@ class UserServiceTest {
 
     @Test
     void getUserByEmail_shouldReturnEmptyIfUserDoesNotExist() {
-        when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
+        doReturn(null).when(userRepository).getUserByEmail("unknown@example.com");
         Optional<User> result = userService.getUserByEmail("unknown@example.com");
 
         assertThat(result).isEmpty();
@@ -146,7 +146,7 @@ class UserServiceTest {
                 .password("pass")
                 .build();
 
-        when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
+        doReturn(null).when(userRepository).getUserByEmail("unknown@example.com");
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(BadCredentialsException.class)
