@@ -1,3 +1,4 @@
+#file: noinspection YAMLSchemaValidation
 openapi: 3.1.1
 info:
   title: Finlog OpenAPI
@@ -10,6 +11,8 @@ tags:
     description: User login and registration
   - name: Transactions
     description: Financial transaction management
+  - name: Users
+    description: User details management
 paths:
   /auth/register:
     $ref: './paths/auth/register.yml'
@@ -27,6 +30,12 @@ paths:
       $ref: './paths/transactions/getSingle.yml'
     delete:
       $ref: './paths/transactions/delete.yml'
+  /api/users:
+    put:
+      $ref: './paths/users/update.yml'
+  /api/users/{id}:
+    delete:
+      $ref: './paths/users/delete.yml'
 components:
   securitySchemes:
     bearerAuth:

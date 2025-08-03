@@ -1,0 +1,21 @@
+tags:
+  - Users
+summary: Delete user
+description: Deletes a user by ID
+operationId: delete
+parameters:
+  - name: id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+responses:
+  '204':
+    description: User deleted successfully
+  '403':
+    description: Access denied, you can't affect other users
+  '404':
+    description: User not found
+security:
+  - bearerAuth: []
