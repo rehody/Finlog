@@ -58,8 +58,7 @@ public class TransactionService {
             request.setId(uuidGenerator.generate());
         }
 
-        Long version = transactionRepository.getVersion(request.getId());
-        Transaction transaction = TransactionMapper.mapToEntity(request, version, user);
+        Transaction transaction = TransactionMapper.mapToEntity(request, 0L, user);
         transactionRepository.save(transaction);
     }
 

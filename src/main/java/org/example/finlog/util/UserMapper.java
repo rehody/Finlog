@@ -10,11 +10,14 @@ import java.util.UUID;
 
 public class UserMapper {
 
-    public static User mapToEntity(UserRequest request, Long version) {
+    public static User mapToEntity(UserRequest request, User existing) {
         return User.builder()
                 .id(request.getId())
+                .email(existing.getEmail())
                 .name(request.getName())
-                .version(version)
+                .passwordHash(existing.getPasswordHash())
+                .registrationDate(existing.getRegistrationDate())
+                .version(existing.getVersion())
                 .build();
     }
 

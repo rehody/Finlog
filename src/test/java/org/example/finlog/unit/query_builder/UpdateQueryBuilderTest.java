@@ -44,7 +44,7 @@ public class UpdateQueryBuilderTest {
     }
 
     @Test
-    void shouldThrowsWhenFieldsMismatch() {
+    void shouldThrowWhenFieldsMismatch() {
         assertThatThrownBy(() ->
                 UpdateQueryBuilder.builder()
                         .update("table")
@@ -57,7 +57,7 @@ public class UpdateQueryBuilderTest {
     }
 
     @Test
-    void shouldThrowsWhenZeroFields() {
+    void shouldThrowWhenZeroFields() {
         assertThatThrownBy(() ->
                 UpdateQueryBuilder.builder()
                         .update("table")

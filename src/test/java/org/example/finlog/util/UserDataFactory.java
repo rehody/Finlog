@@ -1,5 +1,6 @@
 package org.example.finlog.util;
 
+import org.example.finlog.DTO.UserRequest;
 import org.example.finlog.entity.User;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,13 @@ public class UserDataFactory {
                 .version(0L)
                 .createdAt(now)
                 .updatedAt(now)
+                .build();
+    }
+
+    public static UserRequest sampleUserRequest(UUID id) {
+        return UserRequest.builder()
+                .id(id)
+                .name("username")
                 .build();
     }
 

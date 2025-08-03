@@ -5,6 +5,7 @@ import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
 import org.example.finlog.DTO.UserRequest;
 import org.example.finlog.entity.User;
+import org.example.finlog.exception.NotFoundException;
 import org.example.finlog.exception.UserAlreadyExistsException;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
@@ -36,18 +37,18 @@ public class UserService {
     }
 
     public void update(String email, UserRequest request) throws AccessDeniedException {
-        checkPermission(email, request.getId());
+        User existing = getUser(email);
 
-        Long version = userRepository.getVersion(request.getId());
-        User user = UserMapper.mapToEntity(request, version);
+        checkPermission(existing, request.getId());
+        User user = UserMapper.mapToEntity(request, existing);
         userRepository.update(user);
     }
 
     public void delete(String email, UUID id) throws AccessDeniedException {
-        checkPermission(email, id);
+        User existing = getUser(email);
 
-        Long version = userRepository.getVersion(id);
-        userRepository.delete(id, version);
+        checkPermission(existing, id);
+        userRepository.delete(id, existing.getVersion());
     }
 
     public String register(RegisterRequest request) {
@@ -84,8 +85,13 @@ public class UserService {
         return jwtService.generateToken(email);
     }
 
-    private void checkPermission(String email, UUID id) throws AccessDeniedException {
-        if (userRepository.getUserByEmail(email).getId() != id) {
+    private User getUser(String email) {
+        return Optional.ofNullable(userRepository.getUserByEmail(email))
+                .orElseThrow(() -> new NotFoundException("User not found" + email));
+    }
+
+    private void checkPermission(User user, UUID targetId) throws AccessDeniedException {
+        if (!user.getId().equals(targetId)) {
             throw new AccessDeniedException("Access denied");
         }
     }

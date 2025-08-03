@@ -208,7 +208,7 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void update_shouldThrowsWhenVersionMismatch() {
+    void update_shouldThrowWhenVersionMismatch() {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
         transactionRepository.save(transaction);
@@ -284,7 +284,7 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void delete_shouldThrowsWhenVersionMismatch() {
+    void delete_shouldThrowWhenVersionMismatch() {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
         transactionRepository.save(transaction);
@@ -299,7 +299,7 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void delete_shouldThrowsWhenAlreadyDeleted() {
+    void delete_shouldThrowWhenAlreadyDeleted() {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
         transactionRepository.save(transaction);
