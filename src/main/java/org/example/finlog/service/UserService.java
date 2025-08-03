@@ -5,7 +5,6 @@ import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
 import org.example.finlog.DTO.UserRequest;
 import org.example.finlog.entity.User;
-import org.example.finlog.exception.NotFoundException;
 import org.example.finlog.exception.UserAlreadyExistsException;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
@@ -15,6 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,13 +35,17 @@ public class UserService {
         return userRepository.getRegistrationDate(id);
     }
 
-    public void update(UserRequest request) {
+    public void update(String email, UserRequest request) throws AccessDeniedException {
+        checkPermission(email, request.getId());
+
         Long version = userRepository.getVersion(request.getId());
         User user = UserMapper.mapToEntity(request, version);
         userRepository.update(user);
     }
 
-    public void delete(UUID id) {
+    public void delete(String email, UUID id) throws AccessDeniedException {
+        checkPermission(email, id);
+
         Long version = userRepository.getVersion(id);
         userRepository.delete(id, version);
     }
@@ -80,8 +84,9 @@ public class UserService {
         return jwtService.generateToken(email);
     }
 
-    private User getUser(UUID id) {
-        return Optional.ofNullable(userRepository.getById(id))
-                .orElseThrow(() -> new NotFoundException("User not found"));
+    private void checkPermission(String email, UUID id) throws AccessDeniedException {
+        if (userRepository.getUserByEmail(email).getId() != id) {
+            throw new AccessDeniedException("Access denied");
+        }
     }
 }
