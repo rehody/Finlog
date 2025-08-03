@@ -41,19 +41,21 @@ class TransactionRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    private UUID txId;
+    private Transaction transaction;
     private User user;
 
     @BeforeEach
     public void setUp() {
         user = UserDataFactory.sampleUser(UUID.randomUUID());
         userRepository.save(user);
+
+        txId = UUID.randomUUID();
+        transaction = TransactionDataFactory.sampleTransaction(txId, user);
     }
 
     @Test
     void save_shouldInsertTransactionCorrectly() {
-        UUID txId = UUID.randomUUID();
-        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
-
         transactionRepository.save(transaction);
 
         List<Transaction> result = transactionRepository.getAllByUserId(user.getId());
@@ -70,14 +72,10 @@ class TransactionRepositoryTest {
 
     @Test
     void getById_shouldReturnTransactionCorrectly() {
-        UUID txId = UUID.randomUUID();
-        Transaction expected = TransactionDataFactory.sampleTransaction(txId, user);
-
-        transactionRepository.save(expected);
+        transactionRepository.save(transaction);
 
         Transaction actual = transactionRepository.getById(txId);
-
-        compareTransactions(actual, expected);
+        compareTransactions(actual, transaction);
     }
 
     @Test
@@ -160,7 +158,6 @@ class TransactionRepositoryTest {
 
     @Test
     void update_shouldUpdateTransactionCorrectly() {
-        UUID txId = UUID.randomUUID();
         LocalDateTime transactionDate = LocalDateTime.now();
 
         Transaction existing = Transaction.builder()
@@ -190,7 +187,6 @@ class TransactionRepositoryTest {
         transactionRepository.update(request);
 
         Transaction updated = transactionRepository.getById(txId);
-
         compareTransactions(updated, request);
     }
 
@@ -208,9 +204,7 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void update_shouldThrowsWhenVersionMismatch() {
-        UUID txId = UUID.randomUUID();
-        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+    void update_shouldThrowWhenVersionMismatch() {
         transactionRepository.save(transaction);
 
         transaction.setVersion(transaction.getVersion() + 1);
@@ -226,25 +220,26 @@ class TransactionRepositoryTest {
 
     @Test
     void delete_shouldDeleteTransactionCorrectly() {
-        UUID txId = UUID.randomUUID();
-        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
-
         transactionRepository.save(transaction);
 
-        transactionRepository.delete(txId, 0L);
+        Long version = transaction.getVersion();
+        transactionRepository.delete(txId, version);
 
-        assertThat(transactionRepository.getById(txId)).isEqualTo(null);
+        Transaction deleted = transactionRepository.getById(txId);
+        assertThat(deleted).isNull();
     }
 
 
     @Test
     void delete_shouldDoNothingWhenTransactionDoesNotExist() {
-        UUID txId = UUID.randomUUID();
+        Transaction tx1 = TransactionDataFactory.sampleTransaction(UUID.randomUUID(), user);
+        Transaction tx2 = TransactionDataFactory.sampleTransaction(UUID.randomUUID(), user);
+
+        transactionRepository.save(tx1);
+        transactionRepository.save(tx2);
 
         int countBefore = transactionRepository.getAllByUserId(user.getId()).size();
-
         transactionRepository.delete(txId, 0L);
-
         int countAfter = transactionRepository.getAllByUserId(user.getId()).size();
 
         assertThat(countAfter).isEqualTo(countBefore);
@@ -259,61 +254,40 @@ class TransactionRepositoryTest {
         transactionRepository.save(tx2);
 
         int countBefore = transactionRepository.getAllByUserId(user.getId()).size();
-
         transactionRepository.delete(tx2.getId(), 0L);
-
         int countAfter = transactionRepository.getAllByUserId(user.getId()).size();
 
         assertThat(countAfter).isEqualTo(countBefore - 1);
-        assertThat(transactionRepository.getById(tx2.getId())).isEqualTo(null);
+        assertThat(transactionRepository.getById(tx2.getId())).isNull();
         compareTransactions(transactionRepository.getById(tx1.getId()), tx1);
     }
 
     @Test
-    void delete_shouldSoftDeleteAndIncrementVersion() {
-        UUID txId = UUID.randomUUID();
-        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+    void delete_shouldThrowWhenVersionMismatch() {
         transactionRepository.save(transaction);
 
-        Long version = transaction.getVersion();
-
-        transactionRepository.delete(txId, version);
-
-        Transaction deleted = transactionRepository.getById(txId);
-        assertThat(deleted).isNull();
-    }
-
-    @Test
-    void delete_shouldThrowsWhenVersionMismatch() {
-        UUID txId = UUID.randomUUID();
-        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
-        transactionRepository.save(transaction);
-
+        Long version = transaction.getVersion() + 1;
         assertThatThrownBy(() ->
-                transactionRepository.delete(txId, transaction.getVersion() + 1)
+                transactionRepository.delete(txId, version)
         ).isInstanceOf(OptimisticLockingFailureException.class)
                 .hasMessageContaining(
                         "Failed to delete transaction " + txId
-                                + " with version " + (transaction.getVersion() + 1)
+                        + " with version " + version
                 );
     }
 
     @Test
-    void delete_shouldThrowsWhenAlreadyDeleted() {
-        UUID txId = UUID.randomUUID();
-        Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
+    void delete_shouldThrowWhenAlreadyDeleted() {
         transactionRepository.save(transaction);
 
-        Long version = transaction.getVersion();
-
-        transactionRepository.delete(txId, version);
-
+        transactionRepository.delete(txId, transaction.getVersion());
+        Long version = transaction.getVersion() + 1;
         assertThatThrownBy(() ->
-                transactionRepository.delete(txId, version + 1)
+                transactionRepository.delete(txId, version)
         ).isInstanceOf(OptimisticLockingFailureException.class)
                 .hasMessageContaining(
                         "Failed to delete transaction " + txId
-                                + " with version " + (transaction.getVersion() + 1)
+                                + " with version " + version
                 );
     }
 

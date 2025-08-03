@@ -98,7 +98,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void getFilteredData_shouldThrowsWhenUserNotFound() {
+    void getFilteredData_shouldThrowWhenUserNotFound() {
         when(userService.getUserByEmail("nope@example.com")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
@@ -132,7 +132,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void getSingle_shouldThrowsWhenUserNotOwner() {
+    void getSingle_shouldThrowWhenUserNotOwner() {
         UUID txId = UUID.randomUUID();
         Transaction transaction = TransactionDataFactory.sampleTransaction(txId, user);
 
@@ -173,13 +173,17 @@ class TransactionServiceTest {
 
         transactionService.save(user.getEmail(), request);
 
+        extracted(txId, expectedUserId, expectedAmount, expectedDescription, expectedCategory);
+    }
+
+    private void extracted(UUID txId, UUID expectedUserId, BigDecimal expectedAmount, String expectedDescription, Category expectedCategory) {
         verify(transactionRepository).save(argThat(tx ->
                 tx.getId().equals(txId)
-                        && tx.getUserId().equals(expectedUserId)
-                        && tx.getAmount().equals(expectedAmount)
-                        && tx.getDescription().equals(expectedDescription)
-                        && tx.getCategory().equals(expectedCategory)
-                        && tx.getUser().equals(user)
+                && tx.getUserId().equals(expectedUserId)
+                && tx.getAmount().equals(expectedAmount)
+                && tx.getDescription().equals(expectedDescription)
+                && tx.getCategory().equals(expectedCategory)
+                && tx.getUser().equals(user)
         ));
     }
 
@@ -206,12 +210,12 @@ class TransactionServiceTest {
 
         verify(transactionRepository).save(argThat(tx ->
                 tx.getId().equals(txId)
-                        && tx.getUserId().equals(expectedUserId)
-                        && tx.getAmount().equals(expectedAmount)
-                        && tx.getDescription().equals(exceptedDescription)
-                        && tx.getCategory().equals(expectedCategory)
-                        && tx.getTransactionDate().equals(expectedDate)
-                        && tx.getUser().equals(user)
+                && tx.getUserId().equals(expectedUserId)
+                && tx.getAmount().equals(expectedAmount)
+                && tx.getDescription().equals(exceptedDescription)
+                && tx.getCategory().equals(expectedCategory)
+                && tx.getTransactionDate().equals(expectedDate)
+                && tx.getUser().equals(user)
         ));
 
     }
@@ -254,11 +258,11 @@ class TransactionServiceTest {
 
         verify(transactionRepository).update(argThat(tx ->
                 tx.getId().equals(txId) &&
-                        tx.getUser().equals(user) &&
-                        tx.getAmount().equals(expectedAmount) &&
-                        tx.getDescription().equals(expectedDescription) &&
-                        tx.getCategory().equals(expectedCategory) &&
-                        tx.getTransactionDate().equals(expectedTransactionDate)
+                tx.getUser().equals(user) &&
+                tx.getAmount().equals(expectedAmount) &&
+                tx.getDescription().equals(expectedDescription) &&
+                tx.getCategory().equals(expectedCategory) &&
+                tx.getTransactionDate().equals(expectedTransactionDate)
         ));
 
         verify(transactionRepository, never()).delete(any(), any());
@@ -266,7 +270,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void update_shouldThrowsWhenUserNotOwner() {
+    void update_shouldThrowWhenUserNotOwner() {
         UUID txId = UUID.randomUUID();
 
         User attacker = User.builder()
@@ -306,7 +310,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void update_shouldThrowsWhenTransactionNotFound() {
+    void update_shouldThrowWhenTransactionNotFound() {
         UUID txId = UUID.randomUUID();
         TransactionRequest request = TransactionDataFactory.sampleTransactionRequest(txId);
 
@@ -322,7 +326,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void update_shouldThrowsWhenUserNotFound() {
+    void update_shouldThrowWhenUserNotFound() {
         UUID txId = UUID.randomUUID();
         TransactionRequest request = TransactionDataFactory.sampleTransactionRequest(txId);
 
@@ -351,7 +355,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void delete_shouldThrowsWhenUserNotOwner() {
+    void delete_shouldThrowWhenUserNotOwner() {
         UUID txId = UUID.randomUUID();
 
         User attacker = User.builder()
@@ -385,7 +389,7 @@ class TransactionServiceTest {
 
 
     @Test
-    void delete_shouldThrowsWhenTransactionNotFound() {
+    void delete_shouldThrowWhenTransactionNotFound() {
         UUID txId = UUID.randomUUID();
 
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
@@ -398,7 +402,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    void delete_shouldThrowsWhenUserNotFound() {
+    void delete_shouldThrowWhenUserNotFound() {
         UUID txId = UUID.randomUUID();
 
         when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.empty());

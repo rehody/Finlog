@@ -1,0 +1,20 @@
+tags:
+  - Users
+summary: Update user
+description: Updates an existing user
+operationId: update
+requestBody:
+  content:
+    application/json:
+      schema:
+        $ref: '../../components/schemas/UserRequest.yml'
+  required: true
+responses:
+  '200':
+    description: User updated successfully
+  '403':
+    description: Access denied, you can't affect other users
+  '404':
+    description: User not found
+security:
+  - bearerAuth: []

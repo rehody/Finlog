@@ -10,6 +10,8 @@ tags:
     description: User login and registration
   - name: Transactions
     description: Financial transaction management
+  - name: Users
+    description: User details management
 paths:
   /auth/register:
     post:
@@ -236,6 +238,57 @@ paths:
           description: Access denied for this user
         '404':
           description: Transaction or user not found
+      security:
+        - bearerAuth: []
+  /api/users:
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Updates an existing user
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: User updated successfully
+        '403':
+          description: 'Access denied, you can''t affect other users'
+        '404':
+          description: User not found
+      security:
+        - bearerAuth: []
+  '/api/users/{id}':
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Deletes a user by ID
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User deleted successfully
+        '403':
+          description: 'Access denied, you can''t affect other users'
+        '404':
+          description: User not found
       security:
         - bearerAuth: []
 components:

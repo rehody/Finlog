@@ -18,6 +18,7 @@ public class TransactionSelectFactory extends TransactionQueryFactory{
                 .select()
                 .from(TABLE)
                 .where("user_id").eq(userId)
+                .and("deleted").eq(false)
                 .and("transaction_date").between(startDate, endDate);
 
         if (category != null) {

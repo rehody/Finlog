@@ -26,7 +26,7 @@ public class InsertQueryBuilderTest {
     }
 
     @Test
-    void shouldThrowsWhenValuesNumberNotMatchFieldsNumber() {
+    void shouldThrowWhenValuesNumberNotMatchFieldsNumber() {
         assertThatThrownBy(() ->
                 InsertQueryBuilder.builder()
                         .insertInto("table")
@@ -41,7 +41,7 @@ public class InsertQueryBuilderTest {
     }
 
     @Test
-    void shouldThrowsWhenZeroFields() {
+    void shouldThrowWhenZeroFields() {
         assertThatThrownBy(() ->
                 InsertQueryBuilder.builder()
                         .insertInto("table")

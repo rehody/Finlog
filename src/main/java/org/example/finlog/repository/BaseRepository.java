@@ -7,7 +7,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -18,6 +20,12 @@ public abstract class BaseRepository<T extends BaseEntity> {
 
     public abstract void save(T entity);
 
+    public abstract void update(T entity);
+
+    public abstract void delete(UUID id, Long version);
+
+
+    @Transactional
     public T getById(UUID id) {
         try {
             String query = BaseQueryFactory.getByField(table, "id", id);
@@ -25,6 +33,18 @@ public abstract class BaseRepository<T extends BaseEntity> {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    @Transactional
+    public List<T> getAll() {
+        String query = BaseQueryFactory.getAll(table);
+        return jdbcTemplate.query(query, rowMapper);
+    }
+
+    @Transactional
+    public Long getVersion(UUID id) {
+        String query = BaseQueryFactory.getSingleField(table, "version", id);
+        return jdbcTemplate.queryForObject(query, Long.class);
     }
 
     protected void checkOptimisticLock(int affectedRows, UUID id, String message) {

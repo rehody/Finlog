@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("api/transactions")
+@RequestMapping("/api/transactions")
 public class TransactionController {
     private final TransactionService transactionService;
 

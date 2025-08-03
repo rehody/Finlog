@@ -2,7 +2,9 @@ package org.example.finlog.unit.service;
 
 import org.example.finlog.DTO.LoginRequest;
 import org.example.finlog.DTO.RegisterRequest;
+import org.example.finlog.DTO.UserRequest;
 import org.example.finlog.entity.User;
+import org.example.finlog.exception.NotFoundException;
 import org.example.finlog.repository.UserRepository;
 import org.example.finlog.security.JwtService;
 import org.example.finlog.service.UserService;
@@ -17,15 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -64,8 +65,8 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserByEmail_shouldReturnEmptyIfUserNotExists() {
-        when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
+    void getUserByEmail_shouldReturnEmptyIfUserDoesNotExist() {
+        doReturn(null).when(userRepository).getUserByEmail("unknown@example.com");
         Optional<User> result = userService.getUserByEmail("unknown@example.com");
 
         assertThat(result).isEmpty();
@@ -97,9 +98,9 @@ class UserServiceTest {
 
         verify(userRepository).save(argThat(u ->
                 u.getId().equals(userId) &&
-                        u.getName().equals("NewUser") &&
-                        u.getEmail().equals("new@example.com") &&
-                        u.getPasswordHash().equals("encodedPassword")
+                u.getName().equals("NewUser") &&
+                u.getEmail().equals("new@example.com") &&
+                u.getPasswordHash().equals("encodedPassword")
         ));
         assertThat(token).isEqualTo("token");
     }
@@ -145,7 +146,7 @@ class UserServiceTest {
                 .password("pass")
                 .build();
 
-        when(userRepository.getUserByEmail("unknown@example.com")).thenReturn(null);
+        doReturn(null).when(userRepository).getUserByEmail("unknown@example.com");
 
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(BadCredentialsException.class)
@@ -165,5 +166,107 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessageContaining("Invalid credentials");
+    }
+
+    @Test
+    void update_shouldUpdateNameCorrectly() throws AccessDeniedException { // only name updates are allowed for now
+        String expectedEmail = "example@email.com";
+        String expectedPasswordHash = "hash";
+        LocalDateTime expectedRegistrationDate = LocalDateTime.of(2025, 8, 3, 16, 0, 0);
+        Long expectedVersion = 0L;
+        User existing = User.builder()
+                .id(userId)
+                .email(expectedEmail)
+                .name("old name")
+                .passwordHash(expectedPasswordHash)
+                .registrationDate(expectedRegistrationDate)
+                .version(expectedVersion)
+                .build();
+
+        String expectedName = "new name";
+        UserRequest request = UserRequest.builder()
+                .id(userId)
+                .name(expectedName)
+                .build();
+
+        when(userRepository.getUserByEmail(existing.getEmail())).thenReturn(existing);
+
+        userService.update(existing.getEmail(), request);
+
+        verify(userRepository).update(argThat(usr ->
+                usr.getId().equals(userId) &&
+                usr.getEmail().equals(expectedEmail) &&
+                usr.getName().equals(expectedName) &&
+                usr.getPasswordHash().equals(expectedPasswordHash) &&
+                usr.getRegistrationDate().equals(expectedRegistrationDate) &&
+                usr.getVersion().equals(expectedVersion)
+        ));
+
+        verify(userRepository, never()).delete(any(), any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void update_shouldThrowWhenUserIdDoesNotMatch() {
+        UserRequest request = UserDataFactory.sampleUserRequest(userId);
+
+        UUID attackerId = UUID.randomUUID();
+        String attackerEmail = "attacker@email.com";
+        User attacker = UserDataFactory.sampleUser(attackerId);
+
+        when(userRepository.getUserByEmail(attackerEmail)).thenReturn(attacker);
+
+        assertThatThrownBy(() ->
+                userService.update(attackerEmail, request)
+        ).isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Access denied");
+    }
+
+    @Test
+    void update_shouldThrowWhenUserDoesNotExist() {
+        UserRequest request = UserDataFactory.sampleUserRequest(userId);
+
+        doReturn(null).when(userRepository).getUserByEmail(user.getEmail());
+
+        assertThatThrownBy(() ->
+                userService.update(user.getEmail(), request)
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("User not found" + user.getEmail());
+    }
+
+    @Test
+    void delete_shouldDeleteUserCorrectly() throws AccessDeniedException {
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(user);
+
+        userService.delete(user.getEmail(), userId);
+
+        verify(userRepository, times(1)).delete(eq(userId), eq(user.getVersion()));
+
+        verify(userRepository, never()).save(any());
+        verify(userRepository, never()).update(any());
+    }
+
+    @Test
+    void delete_shouldThrowWhenUserIdDoesNotMatch() {
+        UUID attackerId = UUID.randomUUID();
+        String attackerEmail = "attacker@email.com";
+        User attacker = UserDataFactory.sampleUser(attackerId);
+
+        when(userRepository.getUserByEmail(attackerEmail)).thenReturn(attacker);
+
+        assertThatThrownBy(() ->
+                userService.delete(attackerEmail, userId)
+        ).isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Access denied");
+    }
+
+    @Test
+    void delete_shouldThrowWhenUserDoesNotExist() {
+        doReturn(null).when(userRepository).getUserByEmail(user.getEmail());
+
+        assertThatThrownBy(() ->
+                userService.delete(user.getEmail(), userId)
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("User not found" + user.getEmail());
     }
 }
